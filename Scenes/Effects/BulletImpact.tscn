@@ -1,0 +1,73 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://Assets/Misc/smoketexture_soft.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Spatial
+
+export var ttl = 10
+
+func _ready():
+	$Smoke.one_shot = true
+	$Smoke.emitting = true
+	yield(get_tree().create_timer(ttl), \"timeout\")
+	queue_free()
+"
+
+[sub_resource type="SpatialMaterial" id=2]
+flags_transparent = true
+flags_unshaded = true
+params_billboard_mode = 1
+albedo_color = Color( 0, 0, 0, 0.658824 )
+
+[sub_resource type="QuadMesh" id=3]
+material = SubResource( 2 )
+size = Vector2( 0.04, 0.04 )
+
+[sub_resource type="Gradient" id=4]
+colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 0 )
+
+[sub_resource type="GradientTexture" id=5]
+gradient = SubResource( 4 )
+
+[sub_resource type="ParticlesMaterial" id=6]
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 0.15
+angular_velocity = 26.55
+angular_velocity_random = 0.36
+damping = 0.05
+angle = 595.9
+angle_random = 1.0
+color_ramp = SubResource( 5 )
+
+[sub_resource type="SpatialMaterial" id=7]
+flags_transparent = true
+flags_unshaded = true
+vertex_color_use_as_albedo = true
+params_blend_mode = 1
+params_billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+albedo_color = Color( 1, 1, 1, 0.745098 )
+albedo_texture = ExtResource( 1 )
+
+[sub_resource type="QuadMesh" id=8]
+material = SubResource( 7 )
+size = Vector2( 0.25, 0.25 )
+
+[node name="BulletImpact" type="Spatial"]
+script = SubResource( 1 )
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+cast_shadow = 0
+mesh = SubResource( 3 )
+material/0 = null
+
+[node name="Smoke" type="Particles" parent="."]
+amount = 16
+lifetime = 2.0
+explosiveness = 0.75
+process_material = SubResource( 6 )
+draw_pass_1 = SubResource( 8 )
