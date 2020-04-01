@@ -258,7 +258,7 @@ func killed_target(target_name):
 	pass
 
 func get_damage(amt, player_fired, bodypart):
-	if player_fired != name:
+	if player_fired != name: # this will hopefully be useless when networking is implemented
 		print("My " + str(bodypart) + " just got hit!")
 		
 		# play sound

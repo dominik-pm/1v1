@@ -871,3 +871,4 @@ transform = Transform( 0.999928, -0.00405689, -0.0112766, -0.0112764, 5.86212e-0
 shape = SubResource( 19 )
 [connection signal="timeout" from="Camera/TimerShake" to="Camera" method="_on_TimerShake_timeout"]
 [connection signal="animation_finished" from="HandAnimation" to="." method="_on_HandAnimation_animation_finished"]
+[connection signal="area_entered" from="Armature/Skeleton/Head/playerhitbox_head" to="Armature/Skeleton/Head/playerhitbox_head" method="_on_playerhitbox_head_area_entered"]

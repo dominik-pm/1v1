@@ -13,10 +13,10 @@ var ttl = 5
 func _ready():
 	$Timer.start(ttl)
 
-func init(t, dir, s, dmg, player_name):
+func init(t, d, s, dmg, player_name):
 	player_fired = player_name
 	self.global_transform = t
-	self.dir = dir
+	self.dir = d
 	speed = s
 	damage = dmg
 
