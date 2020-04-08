@@ -4,31 +4,27 @@ class_name GenericBullet
 
 var bullet_hole = preload("res://Scenes/Effects/BulletImpact.tscn")
 
-var player_fired = "?"
 var dir = Vector3(0,0,0)
 var speed = 0
-var damage = 1
 var ttl = 5
 
 func _ready():
 	$Timer.start(ttl)
 
-func init(t, d, s, dmg, player_name):
-	player_fired = player_name
+func init(t, d, s):
 	self.global_transform = t
 	self.dir = d
 	speed = s
-	damage = dmg
 
 # Kinematic Body
 
 func _physics_process(delta):
 	var collision = move_and_collide(dir * speed * delta)
 	if collision:
-		# did work before, but does not collide with areas (hitboxes of player)
-		#if collision.collider.has_method("get_damage"):
-		#	collision.collider.get_damage(damage, player_fired_id)
-		hit_world(collision.position)
+		if collision.collider is BodypartHitBox:
+			hit_player()
+		else:
+			hit_world(collision.position)
 
 func hit_player():
 	create_target_hit_effects()

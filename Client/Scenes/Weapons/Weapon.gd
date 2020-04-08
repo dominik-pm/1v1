@@ -12,7 +12,7 @@ export var fire_rate = 0.5
 export var clip_size = 8
 export var reload_rate = 1
 export var damage = 10
-export var fire_power = 100
+export var fire_power = 250
 
 # recoil/spraying
 export var moving_spread = 1.0
@@ -36,7 +36,7 @@ func init():
 	current_ammo = 0
 	current_ammo = clip_size
 
-func shoot_from(transf, dir, velocity, player_name):
+func shoot(transf, dir):
 	$Muzzle/MuzzleFlash.emit_flash()
 	
 	if spraying:
@@ -49,18 +49,11 @@ func shoot_from(transf, dir, velocity, player_name):
 	$RecoilResetTimer.stop()
 	$RecoilResetTimer.start()
 	
-	
-	# more spread when moving
-	var velocity_spread = moving_spread*velocity # velocity = between 0-1,... (not exact)
-	var spread = current_spraying_spread + velocity_spread
-	
-	dir = get_spread(dir, spread)
-	
-	fire(transf, dir, player_name)
+	fire(transf, dir)
 
-func fire(transf, dir, player_name):
+func fire(transf, dir):
 	var b = preload_bullet.instance()
-	b.init(transf, dir, fire_power, damage, player_name)
+	b.init(transf, dir, fire_power)
 	get_tree().root.add_child(b)
 #func fire(transf, dir, player_id):
 	#if global.is_offline:
@@ -71,40 +64,3 @@ func fire(transf, dir, player_name):
 func _on_RecoilResetTimer_timeout():
 	spraying = false
 	current_spraying_spread = 0
-
-# to get a randomized spread
-#var old_object = null
-func get_spread(d, s):
-	return d
-	
-	## ------
-	
-	#if old_object != null:
-	#	old_object.queue_free()
-	##var object = obj.instance()
-	#var object = obj.instance()
-	#get_node(global.GAME_PATH).add_child(object)
-	
-	##print(d)
-	#object.rotation = d
-	##print(object.rotation)
-	#object.global_transform.origin = Vector3(0, 50, 0)
-	
-	var dir = d
-	var r
-	randomize()
-	
-	# random up and down spread
-	r = sin(randf()*2*PI)*s/100 # r = [-1.0;1.0] multiplied with spread/100
-	#object.rotate_object_local(Vector3(1,0,0), r*2*PI)
-	
-	# random left and right spread
-	r = sin(randf()*2*PI)*s/100
-	#object.rotate_object_local(Vector3(0,1,0), r*2*PI)
-	
-	#dir = object.rotation
-	dir = dir.normalized()
-	
-	#old_object = object
-	
-	return dir

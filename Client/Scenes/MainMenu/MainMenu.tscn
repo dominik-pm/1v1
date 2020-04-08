@@ -1,0 +1,144 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/Fonts/grobold_32.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Assets/Fonts/grobold_16.tres" type="DynamicFont" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+onready var nickname_input = $CenterContainer/VBoxContainer/Nickname
+onready var connect_btn = $CenterContainer/VBoxContainer/Connect
+onready var disconnect_btn = $CenterContainer/VBoxContainer/Disconnect
+onready var offline_btn = $CenterContainer/VBoxContainer/Offline
+onready var message_text = $MessageBox/MessageText
+
+func _ready():
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	
+	Network.init_menu(self)
+	
+	message_text.text = \"Client:\"
+	if Network.current_state == Network.STATE.connected:
+		message(\"Game has ended!\")
+		nickname_input.text = Network.nickname
+		connect_btn.disabled = true
+		offline_btn.disabled = true
+	else:
+		disconnect_btn.disabled = true
+
+func connected():
+	message(\"Connected to the server!\")
+	nickname_input.editable = false
+	connect_btn.disabled = true
+	disconnect_btn.disabled = false
+	offline_btn.disabled = true
+
+func disconnected():
+	message(\"Disconnected from the server!\")
+	nickname_input.editable = true
+	connect_btn.disabled = false
+	disconnect_btn.disabled = true
+	offline_btn.disabled = false
+
+func message(msg):
+	message_text.text += \"\\n\"+str(msg)
+
+func _on_Connect_pressed():
+	if nickname_input.text != \"\":
+		var nickname = nickname_input.text
+		nickname = nickname.replace(\" \", \"_\")
+		nickname = nickname.replace(\".\", \"_\")
+		nickname = nickname.replace(\",\", \"_\")
+		Network.connect_to_server(nickname)
+	else:
+		message(\"Please provide a nickname to connect to the server!\")
+
+func _on_Disconnect_pressed():
+	Network.disconnect_from_server()
+
+func _on_Offline_pressed():
+	get_tree().change_scene_to(Maps.scenes[\"Offline\"])
+"
+
+[node name="MainMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -1.43195
+margin_right = -1.43195
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_left = 323.0
+margin_top = 203.0
+margin_right = 700.0
+margin_bottom = 397.0
+
+[node name="Nickname" type="LineEdit" parent="CenterContainer/VBoxContainer"]
+margin_right = 377.0
+margin_bottom = 29.0
+custom_fonts/font = ExtResource( 2 )
+align = 1
+max_length = 18
+placeholder_text = "provide a nickname"
+placeholder_alpha = 0.5
+
+[node name="Connect" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 33.0
+margin_right = 377.0
+margin_bottom = 84.0
+custom_fonts/font = ExtResource( 1 )
+text = "Connect To Server"
+flat = true
+
+[node name="Disconnect" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 377.0
+margin_bottom = 139.0
+custom_fonts/font = ExtResource( 1 )
+text = "Disconnect From Server"
+flat = true
+
+[node name="Offline" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 143.0
+margin_right = 377.0
+margin_bottom = 194.0
+custom_fonts/font = ExtResource( 1 )
+text = "Play Offline"
+flat = true
+
+[node name="MessageBox" type="Control" parent="."]
+anchor_bottom = 1.0
+rect_min_size = Vector2( 300, 0 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MessageText" type="Label" parent="MessageBox"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 2 )
+text = "Connected to server!
+Player connected: nitrogen64
+Game starting in 5 seconds!"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Connect" to="." method="_on_Connect_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Disconnect" to="." method="_on_Disconnect_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Offline" to="." method="_on_Offline_pressed"]

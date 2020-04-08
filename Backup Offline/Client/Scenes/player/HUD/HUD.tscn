@@ -1,0 +1,381 @@
+[gd_scene load_steps=22 format=2]
+
+[ext_resource path="res://Assets/Player/crosshair.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Player/sniperscope.png" type="Texture" id=2]
+[ext_resource path="res://assets/fonts/grobold_16.tres" type="DynamicFont" id=3]
+[ext_resource path="res://assets/fonts/grobold_32.tres" type="DynamicFont" id=4]
+[ext_resource path="res://Assets/Player/sync.svg" type="Texture" id=5]
+[ext_resource path="res://Assets/UI/skull.png" type="Texture" id=6]
+[ext_resource path="res://Assets/Player/damageoverlay.png" type="Texture" id=7]
+[ext_resource path="res://Scenes/player/HUD/HUD.gd" type="Script" id=8]
+[ext_resource path="res://Assets/Weapons/Icons/pistol.png" type="Texture" id=9]
+[ext_resource path="res://Assets/Weapons/Icons/knife.png" type="Texture" id=10]
+[ext_resource path="res://Assets/Weapons/Icons/m4.png" type="Texture" id=11]
+[ext_resource path="res://Assets/UI/death.png" type="Texture" id=12]
+[ext_resource path="res://Scenes/player/HUD/HealthBar.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Scenes/Game/GameMenu.tscn" type="PackedScene" id=14]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Label
+
+func _ready():
+	$ReloadSprite/AnimationPlayer.play(\"idle\")
+	$ReloadSprite.visible = false
+
+func reload(reload_time):
+	$ReloadSprite/AnimationPlayer.play(\"reload\")
+	$ReloadSprite.visible = true
+	yield(get_tree().create_timer(reload_time), \"timeout\")
+	stop_reload()
+
+func stop_reload():
+	$ReloadSprite/AnimationPlayer.play(\"idle\")
+	$ReloadSprite.visible = false
+"
+
+[sub_resource type="Animation" id=2]
+resource_name = "idle"
+
+[sub_resource type="Animation" id=3]
+length = 0.5
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 0.0, 180.0 ]
+}
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Control
+
+var color_unselected = Color(0.7,0.7,0.7)
+var color_selected = Color(1,1,1)
+
+var slots = []
+
+func _ready():
+	slots.push_back($GridContainer/Control/Primary)
+	slots.push_back($GridContainer/Control2/Secondary)
+	slots.push_back($GridContainer/Control3/Knife)
+	deselect_all()
+
+func init_icons(items):
+	for i in range(slots.size()):
+		var icon_path = ItemDB.get_item(items[i])[\"icon\"]
+		slots[i].texture = load(icon_path)
+
+func select_slot(index):
+	deselect_all()
+	slots[index].modulate = color_selected
+
+func deselect_all():
+	for slot in slots:
+		slot.modulate = color_unselected
+"
+
+[sub_resource type="Animation" id=5]
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("DamageIndicator:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.2, 0.5 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0.25 ), Color( 1, 1, 1, 0 ) ]
+}
+
+[sub_resource type="Animation" id=6]
+tracks/0/type = "value"
+tracks/0/path = NodePath("Flash:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0.929412 ) ]
+}
+
+[sub_resource type="Animation" id=7]
+tracks/0/type = "value"
+tracks/0/path = NodePath("Flash:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0.901961 ), Color( 1, 1, 1, 0 ) ]
+}
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource( 8 )
+
+[node name="Crosshair" type="Control" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -32.0
+margin_top = -32.0
+margin_right = 32.0
+margin_bottom = 32.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="crosshair" type="Sprite" parent="Crosshair"]
+position = Vector2( 32, 32 )
+texture = ExtResource( 1 )
+
+[node name="Scope" type="TextureRect" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/separation = 25
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Top" type="MarginContainer" parent="VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 0, 32 )
+
+[node name="FPSCountLabel" type="Label" parent="VBoxContainer/Top"]
+margin_top = 6.0
+margin_right = 1024.0
+margin_bottom = 25.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 3 )
+text = "FPS: 144"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Stats" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 57.0
+margin_right = 1024.0
+margin_bottom = 105.0
+size_flags_horizontal = 3
+custom_constants/separation = 700
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Stats"]
+margin_right = 121.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+custom_constants/separation = 40
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BulletIcon" type="TextureRect" parent="VBoxContainer/Stats/HBoxContainer"]
+margin_bottom = 48.0
+stretch_mode = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AmmoLabel" type="Label" parent="VBoxContainer/Stats/HBoxContainer"]
+margin_left = 40.0
+margin_right = 113.0
+margin_bottom = 48.0
+size_flags_horizontal = 0
+size_flags_vertical = 7
+custom_fonts/font = ExtResource( 4 )
+text = "5 / 5"
+align = 2
+valign = 1
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ReloadSprite" type="Sprite" parent="VBoxContainer/Stats/HBoxContainer/AmmoLabel"]
+modulate = Color( 0, 0, 0, 1 )
+position = Vector2( 8, 19 )
+scale = Vector2( 0.057, 0.057 )
+texture = ExtResource( 5 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="VBoxContainer/Stats/HBoxContainer/AmmoLabel/ReloadSprite"]
+anims/idle = SubResource( 2 )
+anims/reload = SubResource( 3 )
+
+[node name="VBoxContainer" type="HBoxContainer" parent="VBoxContainer/Stats"]
+margin_left = 821.0
+margin_right = 1024.0
+margin_bottom = 48.0
+size_flags_vertical = 3
+custom_constants/separation = 25
+
+[node name="Kills" type="HBoxContainer" parent="VBoxContainer/Stats/VBoxContainer"]
+margin_right = 89.0
+margin_bottom = 48.0
+custom_constants/separation = 5
+
+[node name="KillIcon" type="TextureRect" parent="VBoxContainer/Stats/VBoxContainer/Kills"]
+margin_right = 48.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 48, 32 )
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 6
+
+[node name="KillCountLabel" type="Label" parent="VBoxContainer/Stats/VBoxContainer/Kills"]
+margin_left = 53.0
+margin_right = 89.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+custom_fonts/font = ExtResource( 4 )
+text = "99"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Deaths" type="HBoxContainer" parent="VBoxContainer/Stats/VBoxContainer"]
+margin_left = 114.0
+margin_right = 203.0
+margin_bottom = 48.0
+custom_constants/separation = 5
+
+[node name="DeathIcon" type="TextureRect" parent="VBoxContainer/Stats/VBoxContainer/Deaths"]
+margin_right = 48.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 48, 48 )
+texture = ExtResource( 12 )
+expand = true
+stretch_mode = 6
+
+[node name="DeathCountLabel" type="Label" parent="VBoxContainer/Stats/VBoxContainer/Deaths"]
+margin_left = 53.0
+margin_right = 89.0
+margin_bottom = 48.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+custom_fonts/font = ExtResource( 4 )
+text = "99"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WeaponSlots" type="Control" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -168.0
+margin_top = 391.0
+margin_bottom = -17.0
+script = SubResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GridContainer" type="GridContainer" parent="WeaponSlots"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/vseparation = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Control" type="CenterContainer" parent="WeaponSlots/GridContainer"]
+margin_right = 168.0
+margin_bottom = 64.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Primary" type="TextureRect" parent="WeaponSlots/GridContainer/Control"]
+modulate = Color( 0.75, 0.75, 0.75, 1 )
+margin_left = 52.0
+margin_right = 116.0
+margin_bottom = 64.0
+texture = ExtResource( 11 )
+
+[node name="Control2" type="CenterContainer" parent="WeaponSlots/GridContainer"]
+margin_top = 69.0
+margin_right = 168.0
+margin_bottom = 133.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Secondary" type="TextureRect" parent="WeaponSlots/GridContainer/Control2"]
+margin_left = 52.0
+margin_right = 116.0
+margin_bottom = 64.0
+texture = ExtResource( 9 )
+
+[node name="Control3" type="CenterContainer" parent="WeaponSlots/GridContainer"]
+margin_top = 138.0
+margin_right = 168.0
+margin_bottom = 192.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Knife" type="TextureRect" parent="WeaponSlots/GridContainer/Control3"]
+modulate = Color( 0.75, 0.75, 0.75, 1 )
+margin_left = 38.0
+margin_top = 11.0
+margin_right = 130.0
+margin_bottom = 43.0
+rect_min_size = Vector2( 92, 32 )
+texture = ExtResource( 10 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HealthBar" parent="." instance=ExtResource( 13 )]
+margin_top = -49.0
+margin_bottom = -32.0
+
+[node name="DamageIndicator" type="TextureRect" parent="."]
+self_modulate = Color( 1, 1, 1, 0 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 7 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/damage = SubResource( 5 )
+anims/flash = SubResource( 6 )
+anims/unflash = SubResource( 7 )
+
+[node name="UpdateFPSTimer" type="Timer" parent="."]
+
+[node name="GameMenu" parent="." instance=ExtResource( 14 )]
+[connection signal="timeout" from="UpdateFPSTimer" to="." method="_on_UpdateFPSTimer_timeout"]

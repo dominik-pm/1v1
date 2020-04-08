@@ -1,0 +1,92 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://assets/sounds/ui/switch1.wav" type="AudioStream" id=1]
+[ext_resource path="res://assets/sounds/ui/click1.wav" type="AudioStream" id=2]
+[ext_resource path="res://assets/sounds/ui/click2.wav" type="AudioStream" id=3]
+[ext_resource path="res://assets/sounds/ui/click3.wav" type="AudioStream" id=4]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Spatial
+
+onready var playing_sounds = $playing_sounds
+
+# in db
+var soundfx_max_decibel = 0
+var soundfx_min_decibel = -30
+var music_max_decibel = 0
+var music_min_decibel = -30
+
+export var max_voices = 10
+
+
+# -- PLAY SOUND -->
+func play_sample(sample : AudioStream, relativ_volume : float):
+	var player = AudioStreamPlayer.new()
+	playing_sounds.add_child(player)
+	player.stream = sample
+	var db = get_soundfx_decibel()
+	player.volume_db = db + relativ_volume
+	player.play()
+	player.connect(\"finished\", self, \"on_sound_finished\")
+func on_sound_finished():
+	playing_sounds.get_child(0).queue_free()
+
+	if playing_sounds.get_child_count() > max_voices:
+		playing_sounds.get_child(0).queue_free()
+
+func play_from_bank(name : String):
+	var sound = get_node(name)
+	if sound != null:
+		var db = get_soundfx_decibel()
+		sound.volume_db = db
+		sound.play()
+	else:
+		print(\"invalid sound name\")
+# <-- PLAY SOUND --
+
+func get_soundfx_decibel():
+	# calculate the percent
+	var percent = settings.get_setting(\"audio\", \"sound_volume\")
+	if percent == 0:
+		return -80 # 0% --> inaudible
+	
+	var volume_span = soundfx_max_decibel - soundfx_min_decibel
+	
+	# calculate the new volume based on the percent
+	var db = volume_span * percent
+	db += soundfx_min_decibel
+	
+	return db
+
+func get_music_decibel():
+	# calculate the percent
+	var percent = settings.get_setting(\"audio\", \"music_volume\")
+	if percent == 0:
+		return -80 # 0% --> inaudible
+	
+	var volume_span = music_max_decibel - music_min_decibel
+	
+	# calculate the new volume based on the percent
+	var db = volume_span * percent
+	db += music_min_decibel
+	
+	return db
+"
+
+[node name="SFX" type="Spatial"]
+pause_mode = 2
+script = SubResource( 1 )
+
+[node name="playing_sounds" type="Spatial" parent="."]
+
+[node name="ui_click1" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 2 )
+
+[node name="ui_click2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+
+[node name="ui_click3" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="ui_switch1" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 1 )

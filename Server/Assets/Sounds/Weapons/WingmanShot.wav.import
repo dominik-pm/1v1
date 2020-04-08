@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/WingmanShot.wav-18325b8b69370f9fd135e2e78f55a0b5.sample"
+
+[deps]
+
+source_file="res://Assets/Sounds/Weapons/WingmanShot.wav"
+dest_files=[ "res://.import/WingmanShot.wav-18325b8b69370f9fd135e2e78f55a0b5.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

@@ -1,0 +1,46 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Game/Maps/Base/World.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Game/Maps/Offline/Offline.gd" type="Script" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+func update_self(data):
+	pass
+
+func knife(is_alternate):
+	pass
+
+func shoot(dir, power, dmg):
+	pass
+
+func init_weapons(weapons):
+	pass
+
+func switch_weapon(index):
+	pass
+"
+
+[sub_resource type="CubeMesh" id=2]
+
+[sub_resource type="SpatialMaterial" id=4]
+albedo_color = Color( 0.180392, 0.8, 0.443137, 1 )
+
+[sub_resource type="BoxShape" id=3]
+
+[node name="Map" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+
+[node name="Game" type="Node" parent="." index="0"]
+script = SubResource( 1 )
+
+[node name="Floor" type="StaticBody" parent="EnvironmentNodes" index="0"]
+transform = Transform( 10, 0, 0, 0, 0.25, 0, 0, 0, 10, 0, 0, 0 )
+
+[node name="MeshInstance" type="MeshInstance" parent="EnvironmentNodes/Floor" index="0"]
+mesh = SubResource( 2 )
+material/0 = SubResource( 4 )
+
+[node name="CollisionShape" type="CollisionShape" parent="EnvironmentNodes/Floor" index="1"]
+shape = SubResource( 3 )

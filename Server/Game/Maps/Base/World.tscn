@@ -1,0 +1,51 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Game/Maps/Base/World.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Environments/EnvironmentMorning.tres" type="Environment" id=2]
+[ext_resource path="res://Game/Maps/DeathArea.tscn" type="PackedScene" id=3]
+
+[sub_resource type="GIProbeData" id=1]
+bounds = AABB( -25, -10, -25, 50, 20, 50 )
+cell_size = 0.390625
+to_cell_xform = Transform( 2.56, 0, 0, 0, 2.56, 0, 0, 0, 2.56, 64, 25.6, 64 )
+dynamic_data = PoolIntArray( 0, 8, 128, 64, 128, 1, 0, 0, 0, 1094713344, 1094713344, 5, 322029360, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 8355711, 0 )
+dynamic_range = 4
+bias = 1.5
+normal_bias = 0.0
+propagation = 0.7
+
+[node name="Map" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="CamOverview" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 5, 15 )
+
+[node name="PuppetPlayers" type="Spatial" parent="."]
+
+[node name="PlayerSpawns" type="Spatial" parent="."]
+
+[node name="Spawn1" type="Position3D" parent="PlayerSpawns"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.1448, 4.16045, 5.98128 )
+
+[node name="Spawn2" type="Position3D" parent="PlayerSpawns"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7841, -5.9673 )
+
+[node name="EnvironmentNodes" type="Spatial" parent="."]
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 0.826761, -0.343087, -0.445824, 0.561708, 0.546921, 0.620776, 0.0308501, -0.763655, 0.644887, -11.3, 10.9, 14.3 )
+light_color = Color( 1, 0.843137, 0.658824, 1 )
+light_energy = 0.5
+shadow_enabled = true
+shadow_bias = -0.24
+
+[node name="GIProbe" type="GIProbe" parent="."]
+extents = Vector3( 12.85, 10.35, 12.4 )
+data = SubResource( 1 )
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource( 2 )
+
+[node name="DeathArea" parent="." instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0 )
+[connection signal="body_entered" from="DeathArea" to="." method="_on_DeathArea_body_entered"]

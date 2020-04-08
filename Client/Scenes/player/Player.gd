@@ -6,7 +6,6 @@ var preloaded_death_effect = preload("res://Scenes/Effects/DeathExplosion.tscn")
 
 onready var anim = $AnimationPlayer
 onready var hand_anim = $HandAnimation
-onready var healthbar = $HealthBar
 onready var cam = $Camera
 onready var skel = $Armature/Skeleton
 onready var raycol = $raycol
@@ -16,8 +15,18 @@ onready var hand = $Camera/Hand
 onready var muzzle = $Camera/PlayerMuzzle
 onready var emitting_sounds = $EmittingSounds
 onready var sound_emitter_pos = $SoundEmitterPosition
+onready var status_hud = $StatusHUD
+
+
+var data = { 
+	id = 99, 
+	position = Vector3(0,3,0), 
+	rotation = Vector3(0,0,0), 
+	headrotation = Vector3(0,0,0)
+}
 
 var hud
+var game
 var headbone
 var initial_head_transform
 
@@ -53,9 +62,9 @@ export var LIMBSHOT_MULTIPLIER = 0.8
 var sens = 1
 var fov = 90
 var kills = 0
+var deaths = 0
 var max_health = 100
 var health = max_health
-var kill_count = 0
 var switching_weapons = false
 
 var scoping = false
@@ -70,9 +79,13 @@ var recoil = false
 var sounds
 
 func _ready():
-	init("Player1", ["m4", "pistol", "knife"])
+	#init("Player1", ["m4", "pistol", "knife"])
+	pass
 
-func init(n, weapons):
+func init(info):
+	data = info
+	game = get_parent().get_node("Game")
+	
 	hud = get_node("HUD")
 	
 	sounds = {
@@ -93,22 +106,24 @@ func init(n, weapons):
 	#cam.translation = skel.get_bone_global_pose(headbone).origin # wrong?
 	initial_head_transform = skel.get_bone_pose(headbone)
 	
+	var weapons = ["m4", "pistol", "knife"]
 	hand.init(weapons)
+	game.init_weapons(weapons)
 	hud.init_weapons(weapons)
 	
-	name = n
-	$NameTag.set_name(name)
-	$HealthBar.update(health)
+	name = str(info.id) # TODO
+	
 	hud.update_health(health)
 	hud.update_kill_count(kills)
+	hud.update_death_count(deaths)
 	
-	$NameTag.visible = false
-	$HealthBar.visible = false
 	$Armature/Skeleton/Character.visible = false
 
+func display_status(msg):
+	status_hud.display_status(msg)
+
 func _input(event):
-	if can_move:
-		get_action(event)
+	get_action(event)
 	if can_aim:
 		aim(event)
 
@@ -116,8 +131,8 @@ func aim(event):
 	# aim
 	if event is InputEventMouseMotion:
 		var movement = event.relative
-		rotate_y(-deg2rad(movement.x * sens))
-		cam.rotation.x += -deg2rad(movement.y * sens)
+		rotate_y((-movement.x * sens)*0.02)
+		cam.rotation.x += (-movement.y * sens)*0.02
 		clamp_aim()
 
 func get_action(event):
@@ -149,21 +164,26 @@ func clamp_aim():
 
 func _process(delta):
 	get_input(delta)
+	data.position = global_transform.origin
+	data.headrotation = cam.rotation
+	data.rotation = rotation
 
 func get_input(delta):
 	if can_move:
 		# shooting
 		if Input.is_action_pressed("shoot") and not switching_weapons and hand.selected_weapon != null:
-			var muzzle_transform = muzzle.get_global_transform()
-			var dir = muzzle_transform.origin-cam.get_global_transform().origin
-			dir = dir.normalized()
-			hand.shoot_from_pos(muzzle_transform, dir, vel.length())
+			if hand.selected_weapon.item["slot"] != "KNIFE":
+				var muzzle_transform = muzzle.get_global_transform()
+				var dir = muzzle_transform.origin-cam.get_global_transform().origin
+				dir = dir.normalized()
+				hand.shoot(muzzle_transform, dir, vel.length())
+			else:
+				hand.knife(false)
 		
 		# knife alternate
 		if Input.is_action_pressed("alternate_knife"):
 			if hand.selected_weapon.item["slot"] == "KNIFE":
-				hand.shoot_from_pos(Vector3(0,0,0), Vector3(0,0,0), vel.length())
-	
+				hand.knife(true)
 	
 	# movement
 	var target_dir = Vector2(0, 0)
@@ -227,27 +247,29 @@ func get_input(delta):
 	if vel.y < max_grav:
 		vel.y = max_grav
 	
+	# change the state
 	if can_move:
-		# change the state
 		if Input.is_action_just_pressed("jump") and footcast.is_colliding():
 			# jump
 			vel.y = jump_force
 			anim.play("idle", BLEND_TIME)
 			anim.play("jump", BLEND_TIME)
+			data.animation = "jump"
 			jumping = true
-		if Input.is_action_pressed("crouch") and not (crouching or jumping):
-			# crouch
-			anim.play("crouch", BLEND_TIME)
-			crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 3.3, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-			crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,2.4,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-			crouchtween.start()
-			crouching = true
-		elif (not Input.is_action_pressed("crouch") or jumping) and crouching:
-			# release crouch
-			crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 5, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-			crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,0.6,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-			crouchtween.start()
-			crouching = false
+	if Input.is_action_pressed("crouch") and not (crouching or jumping):
+		# crouch
+		anim.play("crouch", BLEND_TIME)
+		data.animation = "crouch"
+		crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 3.3, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+		crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,2.4,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+		crouchtween.start()
+		crouching = true
+	elif (not Input.is_action_pressed("crouch") or jumping) and crouching:
+		# release crouch
+		crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 5, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+		crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,0.6,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+		crouchtween.start()
+		crouching = false
 	
 	move_and_slide(vel, Vector3(0, 1, 0))
 	
@@ -263,55 +285,54 @@ func switching_weapons(index):
 	hud.update_weapon(index)
 	SFX.play_sample(sounds["weapon_switch"], -15.0)
 	hand_anim.play("switch_weapon")
+	game.switch_weapon(index) # tell the network
 
 func reloading():
 	SFX.play_sample(sounds["reload"], -20.0)
 	hand_anim.play("reload")
 
-func shooting():
+func shooting(dir, power):
+	game.shoot(dir, power, hand.selected_weapon.damage)
 	sound_emit(hand.selected_weapon.shooting_sound)
 	hand_anim.play("shoot")
+func knifing(is_alternate):
+	game.knife(is_alternate)
+	sound_emit(hand.selected_weapon.shooting_sound)
 
-func hit_target(target_name):
+# server called ->
+func hit_target(dmg):
+	print("Hit target for " + str(dmg) + " damage!")
 	SFX.play_sample(sounds["hit_target"], 0.0)
-
-func killed_target(target_name):
-	pass
-
-func get_damage(amt, player_fired, bodypart):
-	if player_fired != name: # this will hopefully be useless when networking is implemented
-		print("My " + str(bodypart) + " just got hit!")
-		
-		# play sound
-		SFX.play_sample(sounds["damaged"], 0.0)
-		
-		# damage indicator
-		hud.get_damage()
-		
-		# logic
-		var d = amt
-		if bodypart == "head":
-			d *= HEADSHOT_MULTIPLIER
-		elif bodypart == "body":
-			d *= BODYSHOT_MULTIPLIER
-		elif bodypart == "limb":
-			d *= LIMBSHOT_MULTIPLIER
-		health -= d
-		if health <= 0:
-			health = 0
-			die(player_fired)
-		
-		# update health
-		hud.update_health(health)
-		healthbar.update(health)
-
-func die(player_killed):
-	print("Just got killed from " + player_killed + "! :/")
+func killed_target(tid):
+	kills = kills + 1
+	hud.update_kill_count(kills)
+func get_damage(amt):
+	health -= amt
+	# play sound
+	SFX.play_sample(sounds["damaged"], 0.0)
+	# damage indicator
+	hud.get_damage()
+	# update health
+	hud.update_health(health)
+func die():
+	deaths = deaths + 1
+	hud.update_death_count(deaths)
+func remove_kills(amt):
+	kills -= amt
+	hud.update_kill_count(kills)
+func respawn(pos):
+	health = max_health
+	hud.update_health(health)
 	
-	# effects
-	var deatheffect = preloaded_death_effect.instance()
-	get_tree().root.add_child(deatheffect)
-	deatheffect.global_transform.origin = $Center.global_transform.origin
+	hand.reset(["m4", "pistol", "knife"])
+	hud.init_weapons(["m4", "pistol", "knife"])
+	
+	global_transform.origin = pos
+func get_stunned(enable_stun):
+	can_move = !enable_stun
+func update_killfeed(killer, victim):
+	hud.update_killfeed(killer, victim)
+# <- server called
 
 func is_sound_playing(sound_name : String):
 	var audioplayer = null
@@ -323,13 +344,12 @@ func is_sound_playing(sound_name : String):
 		return audioplayer.playing
 
 func sound_emit(sound_name : String):
+	game.emit_sound(sound_name)
 	play_sound(sound_name)
-	#if global.is_offline:
-	#	play_sound(sound_name)
-	#else:
-	#	global.rpc_id(1, "play_sound", sound_name, name)
 
 func play_sound(sound_name : String):
+	# theoretically this can be a AudioStreamPlayer sound (doesnt have to be spatial)
+	
 	var audioplayer = null
 	for audiop in emitting_sounds.get_children():
 		if audiop.name == sound_name:
@@ -381,3 +401,4 @@ func set_anim(dir):
 		anim.play_backwards("frontleft", BLEND_TIME)
 	elif dir == Vector2(1, -1) and not (anim.current_animation == "frontright" and anim.get_playing_speed() < 0):
 		anim.play_backwards("frontright", BLEND_TIME)
+	data.animation = anim.current_animation

@@ -1,10 +1,11 @@
 extends CanvasLayer
 
 onready var player = $"../"
-onready var ammo = $VBoxContainer/Stats/HBoxContainer/AmmoLabel
+onready var ammo = $WeaponSlots/VBoxContainer/Ammo/AmmoLabel
+onready var bullet_icon = $WeaponSlots/VBoxContainer/Ammo/BulletIcon
 onready var healthbar = $HealthBar
-onready var kill_count_label = $VBoxContainer/Stats/VBoxContainer/Kills/KillCountLabel
-onready var death_count_label = $VBoxContainer/Stats/VBoxContainer/Deaths/DeathCountLabel
+onready var kill_count_label = $VBoxContainer/Stats/KillsDeaths/Kills/KillCountLabel
+onready var death_count_label = $VBoxContainer/Stats/KillsDeaths/Deaths/DeathCountLabel
 onready var fps_count_label = $VBoxContainer/Top/FPSCountLabel
 onready var slots = $WeaponSlots
 onready var dmg_indicator = $DamageIndicator
@@ -13,6 +14,7 @@ onready var scope_overlay = $Scope
 onready var crosshair = $Crosshair
 onready var fps_timer = $UpdateFPSTimer
 onready var game_menu = $GameMenu
+onready var killfeed = $Killfeed
 
 
 var menu_open = false
@@ -47,11 +49,14 @@ func get_damage():
 	anim.play("damage")
 
 func update_ammo(weapon, reloading):
-	if weapon.is_in_group("knife"):
+	if weapon.item["slot"] == "KNIFE":
 		ammo.text = ""
+		ammo.stop_reload()
+		bullet_icon.visible = false
 	else:
+		bullet_icon.visible = true
 		if reloading:
-			ammo.text = "  / " + str(weapon.clip_size)
+			ammo.text = ""# "  / " + str(weapon.clip_size)
 			ammo.reload(weapon.reload_rate)
 		else:
 			ammo.stop_reload()
@@ -62,6 +67,7 @@ func update_ammo(weapon, reloading):
 
 func hide_ammo():
 	ammo.text = ""
+	bullet_icon.visible = false
 
 func update_weapon(index):
 	slots.select_slot(index)
@@ -74,6 +80,9 @@ func update_kill_count(kill_count):
 
 func update_death_count(death_count):
 	death_count_label.text = str(death_count)
+
+func update_killfeed(killer, victim):
+	killfeed.update_feed(killer, victim)
 
 func _input(event):
 	if event.is_action_pressed("toggle_menu"):

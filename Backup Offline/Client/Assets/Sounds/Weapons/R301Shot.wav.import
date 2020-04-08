@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/R301Shot.wav-4840e6046fa430c99f8573d7991a272a.sample"
+
+[deps]
+
+source_file="res://Assets/Sounds/Weapons/R301Shot.wav"
+dest_files=[ "res://.import/R301Shot.wav-4840e6046fa430c99f8573d7991a272a.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

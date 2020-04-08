@@ -1,0 +1,61 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Assets/Fonts/grobold_16.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Scenes/player/HUD/Killfeed/KillfeedEntry.gd" type="Script" id=2]
+[ext_resource path="res://Assets/UI/skull.png" type="Texture" id=3]
+
+[sub_resource type="Animation" id=1]
+resource_name = "FadeOut"
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+
+[node name="KillfeedEntry" type="HBoxContainer"]
+margin_right = 310.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+custom_constants/separation = 10
+alignment = 2
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Killer" type="Label" parent="."]
+margin_left = 141.0
+margin_top = 2.0
+margin_right = 205.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 1 )
+text = "nitrogen"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_left = 215.0
+margin_right = 247.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 32, 24 )
+size_flags_vertical = 3
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+
+[node name="Victim" type="Label" parent="."]
+margin_left = 257.0
+margin_top = 2.0
+margin_right = 310.0
+margin_bottom = 21.0
+custom_fonts/font = ExtResource( 1 )
+text = "shroud"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/FadeOut = SubResource( 1 )
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

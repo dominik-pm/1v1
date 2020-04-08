@@ -1,0 +1,55 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scenes/HUD/Killfeed/KillfeedEntry.tscn" type="PackedScene" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+export var MAX_FEED_SIZE = 5
+onready var container = $VBoxContainer
+var empty_feed = preload(\"res://Scenes/HUD/Killfeed/KillfeedEntry.tscn\")
+
+func _ready():
+	# remote demo killfeed-entry
+	var demo_entry = container.get_child(0)
+	container.remove_child(demo_entry)
+	demo_entry.queue_free()
+
+func update_feed(killer, victim):
+	# add the new entry
+	var new_entry = empty_feed.instance()
+	new_entry.init(killer, victim)
+	container.add_child(new_entry)
+	
+	# clear the top entry if killfeed exeeds max size
+	if container.get_child_count() > MAX_FEED_SIZE:
+		var to_remove = container.get_child(0)
+		clear_entry(to_remove)
+
+func clear_entry(entry):
+	container.remove_child(entry)
+	entry.queue_free()
+"
+
+[node name="Killfeed" type="Control"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -320.0
+margin_bottom = 128.0
+rect_min_size = Vector2( 320, 128 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 10.0
+margin_right = -10.0
+custom_constants/separation = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="KillfeedEntry" parent="VBoxContainer" instance=ExtResource( 2 )]

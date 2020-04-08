@@ -1,0 +1,438 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Assets/Fonts/grobold_16.tres" type="DynamicFont" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+signal update_player_settings
+
+# nodes
+#general
+onready var input_show_fps = $CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8/InputShowFPS
+#player
+onready var input_sensitivity = $CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer/InputSensitivity
+onready var input_fov = $CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2/InputFOV
+#video
+onready var input_fullscreen = $CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer8/InputFullscreen
+onready var input_msaa = $CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer9/InputMSAA
+#audio
+onready var sound_volume = $CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8/InputSoundVolume
+onready var sound_volume_display = $CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8/InputSoundVolumeText
+onready var music_volume = $CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9/InputMusicVolume
+onready var music_volume_display = $CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9/InputMusicVolumeText
+# --
+
+func _ready():
+	self.connect(\"update_player_settings\", get_parent(), \"update_player_settings\")
+
+func show_menu():
+	init_values()
+	show()
+	focus_mode = Control.FOCUS_ALL
+func hide_menu():
+	settings.save_settings()
+	hide()
+
+func init_values():
+	input_show_fps.pressed = settings.get_setting(\"general\", \"show_fps\")
+	input_sensitivity.value = settings.get_setting(\"player\", \"mouse_sensitivity\")
+	input_fov.value = settings.get_setting(\"player\", \"fov\")
+	input_fullscreen.pressed = settings.get_setting(\"video\", \"fullscreen\")
+	input_msaa.pressed = settings.get_setting(\"video\", \"msaa\")
+	sound_volume.value = settings.get_setting(\"audio\", \"sound_volume\")*100
+	music_volume.value = settings.get_setting(\"audio\", \"music_volume\")*100
+
+func _on_CloseBtn_pressed():
+	settings.save_settings()
+	hide()
+
+# - GENERAL -
+func _on_InputShowFPS_toggled(button_pressed):
+	settings.set_setting(\"general\", \"show_fps\", button_pressed)
+
+
+# - PLAYER -
+func _on_InputSensitivity_value_changed(value):
+	settings.set_setting(\"player\", \"mouse_sensitivity\", value)
+	emit_signal(\"update_player_settings\")
+
+func _on_InputFOV_value_changed(value):
+	settings.set_setting(\"player\", \"fov\", value)
+	emit_signal(\"update_player_settings\")
+
+
+# - VIDEO -
+func _on_InputFullscreen_toggled(button_pressed):
+	settings.set_setting(\"video\", \"fullscreen\", button_pressed)
+	OS.window_fullscreen = button_pressed
+
+func _on_InputMSAA_toggled(button_pressed):
+	settings.set_setting(\"video\", \"msaa\", button_pressed)
+	if button_pressed:
+		get_viewport().msaa = Viewport.MSAA_8X
+	else:
+		get_viewport().msaa = Viewport.MSAA_DISABLED
+
+# - AUDIO -
+func _on_InputSoundVolume_value_changed(value):
+	settings.set_setting(\"audio\", \"sound_volume\", value/100)
+	sound_volume_display.text = str(value)
+
+func _on_InputMusicVolume_value_changed(value):
+	settings.set_setting(\"audio\", \"music_volume\", value/100)
+	music_volume_display.text = str(value)
+"
+
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 0.172549, 0.243137, 0.313726, 1 )
+
+[sub_resource type="StyleBoxFlat" id=3]
+bg_color = Color( 0.286275, 0.286275, 0.286275, 1 )
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.117647, 0.168627, 0.219608, 1 )
+
+[sub_resource type="StyleBoxFlat" id=5]
+bg_color = Color( 0.203922, 0.286275, 0.368627, 1 )
+
+[node name="SettingsMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 0.773743
+margin_top = -0.663422
+margin_right = 0.773682
+margin_bottom = -0.663452
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TabContainer" type="TabContainer" parent="CenterContainer"]
+margin_left = 311.0
+margin_top = 150.0
+margin_right = 811.0
+margin_bottom = 500.0
+rect_min_size = Vector2( 400, 300 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_styles/tab_fg = SubResource( 2 )
+custom_styles/tab_disabled = SubResource( 3 )
+custom_styles/tab_bg = SubResource( 4 )
+custom_styles/panel = SubResource( 5 )
+custom_fonts/font = ExtResource( 1 )
+custom_constants/side_margin = 0
+tab_align = 0
+
+[node name="General" type="Tabs" parent="CenterContainer/TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 19.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer2" type="ScrollContainer" parent="CenterContainer/TabContainer/General"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/General/ScrollContainer2"]
+margin_right = 500.0
+margin_bottom = 331.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 10
+
+[node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer"]
+margin_right = 500.0
+margin_bottom = 40.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8"]
+margin_top = 10.0
+margin_right = 420.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Show FPS"
+
+[node name="InputShowFPS" type="CheckButton" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8"]
+margin_left = 424.0
+margin_right = 500.0
+margin_bottom = 40.0
+
+[node name="Player" type="Tabs" parent="CenterContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 19.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/TabContainer/Player"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/Player/ScrollContainer"]
+margin_right = 500.0
+margin_bottom = 331.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer"]
+margin_right = 400.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_top = 2.0
+margin_right = 322.0
+margin_bottom = 21.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Sensitivity"
+
+[node name="InputSensitivity" type="SpinBox" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer"]
+margin_left = 326.0
+margin_right = 400.0
+margin_bottom = 24.0
+min_value = 0.01
+max_value = 10.0
+step = 0.01
+value = 1.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer"]
+margin_top = 34.0
+margin_right = 400.0
+margin_bottom = 58.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2"]
+margin_top = 2.0
+margin_right = 322.0
+margin_bottom = 21.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "FOV"
+
+[node name="InputFOV" type="SpinBox" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 326.0
+margin_right = 400.0
+margin_bottom = 24.0
+min_value = 60.0
+max_value = 120.0
+step = 5.0
+value = 90.0
+
+[node name="Video" type="Tabs" parent="CenterContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 19.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/TabContainer/Video"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/Video/ScrollContainer"]
+margin_right = 500.0
+margin_bottom = 331.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 10
+
+[node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer"]
+margin_right = 400.0
+margin_bottom = 40.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer8"]
+margin_top = 10.0
+margin_right = 320.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Fullscreen"
+
+[node name="InputFullscreen" type="CheckButton" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer8"]
+margin_left = 324.0
+margin_right = 400.0
+margin_bottom = 40.0
+
+[node name="HBoxContainer9" type="HBoxContainer" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer"]
+margin_top = 50.0
+margin_right = 400.0
+margin_bottom = 90.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer9"]
+margin_top = 10.0
+margin_right = 320.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "MSAA"
+
+[node name="InputMSAA" type="CheckButton" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer9"]
+margin_left = 324.0
+margin_right = 400.0
+margin_bottom = 40.0
+
+[node name="Audio" type="Tabs" parent="CenterContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 19.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer2" type="ScrollContainer" parent="CenterContainer/TabContainer/Audio"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/Audio/ScrollContainer2"]
+margin_right = 500.0
+margin_bottom = 331.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 10
+
+[node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer"]
+margin_right = 400.0
+margin_bottom = 19.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8"]
+margin_right = 130.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Sound Volume"
+
+[node name="InputSoundVolumeText" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8"]
+margin_left = 134.0
+margin_right = 264.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "20"
+align = 1
+
+[node name="InputSoundVolume" type="HSlider" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8"]
+margin_left = 268.0
+margin_right = 400.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+
+[node name="HBoxContainer9" type="HBoxContainer" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer"]
+margin_top = 29.0
+margin_right = 400.0
+margin_bottom = 48.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9"]
+margin_right = 130.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Music Volume"
+
+[node name="InputMusicVolumeText" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9"]
+margin_left = 134.0
+margin_right = 264.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "20"
+align = 1
+
+[node name="InputMusicVolume" type="HSlider" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9"]
+margin_left = 268.0
+margin_right = 400.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+
+[node name="KeyBindings" type="Tabs" parent="CenterContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 19.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer2" type="ScrollContainer" parent="CenterContainer/TabContainer/KeyBindings"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/KeyBindings/ScrollContainer2"]
+margin_right = 500.0
+margin_bottom = 331.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 10
+
+[node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/KeyBindings/ScrollContainer2/VBoxContainer"]
+margin_right = 500.0
+
+[node name="Save and Close" type="Tabs" parent="CenterContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 19.0
+
+[node name="CenterContainer" type="CenterContainer" parent="CenterContainer/TabContainer/Save and Close"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CloseBtn" type="Button" parent="CenterContainer/TabContainer/Save and Close/CenterContainer"]
+margin_left = 129.0
+margin_top = 153.0
+margin_right = 371.0
+margin_bottom = 178.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Save and Close Settings menu"
+flat = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="toggled" from="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8/InputShowFPS" to="." method="_on_InputShowFPS_toggled"]
+[connection signal="value_changed" from="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer/InputSensitivity" to="." method="_on_InputSensitivity_value_changed"]
+[connection signal="value_changed" from="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2/InputFOV" to="." method="_on_InputFOV_value_changed"]
+[connection signal="toggled" from="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer8/InputFullscreen" to="." method="_on_InputFullscreen_toggled"]
+[connection signal="toggled" from="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer9/InputMSAA" to="." method="_on_InputMSAA_toggled"]
+[connection signal="value_changed" from="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8/InputSoundVolume" to="." method="_on_InputSoundVolume_value_changed"]
+[connection signal="value_changed" from="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9/InputMusicVolume" to="." method="_on_InputMusicVolume_value_changed"]
+[connection signal="pressed" from="CenterContainer/TabContainer/Save and Close/CenterContainer/CloseBtn" to="." method="_on_CloseBtn_pressed"]
