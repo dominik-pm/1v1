@@ -1,10 +1,8 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Assets/Sounds/UI/click1.wav" type="AudioStream" id=1]
 [ext_resource path="res://Assets/Sounds/UI/click3.wav" type="AudioStream" id=2]
 [ext_resource path="res://Assets/Sounds/UI/click1.wav" type="AudioStream" id=3]
 [ext_resource path="res://Assets/Sounds/UI/click2.wav" type="AudioStream" id=4]
-
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Spatial
@@ -90,4 +88,4 @@ stream = ExtResource( 4 )
 stream = ExtResource( 2 )
 
 [node name="ui_switch1" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 1 )
+stream = ExtResource( 3 )

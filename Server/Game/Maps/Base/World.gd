@@ -32,28 +32,28 @@ func _input(event):
 		overview_cam.current = true
 		in_overview = true
 		var ps = get_puppets()
-		ps[spectating_index].spectate(false)
+		ps[spectating_index].set_spectate(false)
 	
 	var ps = get_puppets()
 	if ps.size() > 0:
 		if event.is_action_pressed("spectate_next"):
 			overview_cam.current = false
-			ps[spectating_index].spectate(false)
+			ps[spectating_index].set_spectate(false)
 			if ps.size() > spectating_index + 1:
 				spectating_index = spectating_index + 1
 			else:
 				spectating_index = 0
 			in_overview = false
-			ps[spectating_index].spectate(true)
+			ps[spectating_index].set_spectate(true)
 		if event.is_action_pressed("spectate_previous"):
 			overview_cam.current = false
-			ps[spectating_index].spectate(false)
+			ps[spectating_index].set_spectate(false)
 			if spectating_index >= 1:
 				spectating_index = spectating_index - 1
 			else:
 				spectating_index = ps.size()-1
 			in_overview = false
-			ps[spectating_index].spectate(true)
+			ps[spectating_index].set_spectate(true)
 
 func get_puppets():
 	var ps = []

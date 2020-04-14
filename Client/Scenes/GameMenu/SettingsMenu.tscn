@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Assets/Fonts/grobold_16.tres" type="DynamicFont" id=1]
 
@@ -10,6 +10,7 @@ signal update_player_settings
 # nodes
 #general
 onready var input_show_fps = $CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8/InputShowFPS
+onready var input_show_vel = $CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer9/InputShowVEL
 #player
 onready var input_sensitivity = $CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer/InputSensitivity
 onready var input_fov = $CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2/InputFOV
@@ -36,6 +37,7 @@ func hide_menu():
 
 func init_values():
 	input_show_fps.pressed = settings.get_setting(\"general\", \"show_fps\")
+	input_show_vel.pressed = settings.get_setting(\"general\", \"show_vel\")
 	input_sensitivity.value = settings.get_setting(\"player\", \"mouse_sensitivity\")
 	input_fov.value = settings.get_setting(\"player\", \"fov\")
 	input_fullscreen.pressed = settings.get_setting(\"video\", \"fullscreen\")
@@ -50,6 +52,10 @@ func _on_CloseBtn_pressed():
 # - GENERAL -
 func _on_InputShowFPS_toggled(button_pressed):
 	settings.set_setting(\"general\", \"show_fps\", button_pressed)
+
+func _on_InputShowVEL_toggled(button_pressed):
+	settings.set_setting(\"general\", \"show_vel\", button_pressed)
+
 
 
 # - PLAYER -
@@ -96,6 +102,33 @@ bg_color = Color( 0.117647, 0.168627, 0.219608, 1 )
 [sub_resource type="StyleBoxFlat" id=5]
 bg_color = Color( 0.203922, 0.286275, 0.368627, 1 )
 
+[sub_resource type="GDScript" id=6]
+script/source = "extends Button
+
+var key
+var value
+var menu
+
+var waiting_input = false
+
+func _input(event):
+	if waiting_input:
+		if event is InputEventKey:
+			value = event.scancode
+			text = OS.get_scancode_string(value)
+			pressed = false
+			waiting_input = false
+		if event is InputEventMouseButton:
+			text = OS.get_scancode_string(value)
+			pressed = false
+			waiting_input = false
+
+func _on_KeyInputButton_toggled(button_pressed):
+	if button_pressed:
+		waiting_input = true
+		set_text(\"Press Any Key\")
+"
+
 [node name="SettingsMenu" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -116,11 +149,11 @@ __meta__ = {
 }
 
 [node name="TabContainer" type="TabContainer" parent="CenterContainer"]
-margin_left = 311.0
-margin_top = 150.0
-margin_right = 811.0
-margin_bottom = 500.0
-rect_min_size = Vector2( 400, 300 )
+margin_left = 659.0
+margin_top = 340.0
+margin_right = 1259.0
+margin_bottom = 740.0
+rect_min_size = Vector2( 600, 400 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_styles/tab_fg = SubResource( 2 )
@@ -132,6 +165,7 @@ custom_constants/side_margin = 0
 tab_align = 0
 
 [node name="General" type="Tabs" parent="CenterContainer/TabContainer"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = 19.0
@@ -148,27 +182,45 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/General/ScrollContainer2"]
-margin_right = 500.0
-margin_bottom = 331.0
+margin_right = 600.0
+margin_bottom = 381.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 10
 
 [node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer"]
-margin_right = 500.0
+margin_right = 600.0
 margin_bottom = 40.0
 
 [node name="Label" type="Label" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8"]
 margin_top = 10.0
-margin_right = 420.0
+margin_right = 520.0
 margin_bottom = 29.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "Show FPS"
 
 [node name="InputShowFPS" type="CheckButton" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8"]
-margin_left = 424.0
-margin_right = 500.0
+margin_left = 524.0
+margin_right = 600.0
+margin_bottom = 40.0
+
+[node name="HBoxContainer9" type="HBoxContainer" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer"]
+margin_top = 50.0
+margin_right = 600.0
+margin_bottom = 90.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer9"]
+margin_top = 10.0
+margin_right = 520.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Show Velocity"
+
+[node name="InputShowVEL" type="CheckButton" parent="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer9"]
+margin_left = 524.0
+margin_right = 600.0
 margin_bottom = 40.0
 
 [node name="Player" type="Tabs" parent="CenterContainer/TabContainer"]
@@ -187,8 +239,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/Player/ScrollContainer"]
-margin_right = 500.0
-margin_bottom = 331.0
+margin_right = 600.0
+margin_bottom = 381.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 10
@@ -197,20 +249,20 @@ __meta__ = {
 }
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer"]
-margin_right = 400.0
+margin_right = 600.0
 margin_bottom = 24.0
 
 [node name="Label" type="Label" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer"]
 margin_top = 2.0
-margin_right = 322.0
+margin_right = 522.0
 margin_bottom = 21.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "Sensitivity"
 
 [node name="InputSensitivity" type="SpinBox" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer"]
-margin_left = 326.0
-margin_right = 400.0
+margin_left = 526.0
+margin_right = 600.0
 margin_bottom = 24.0
 min_value = 0.01
 max_value = 10.0
@@ -219,20 +271,20 @@ value = 1.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer"]
 margin_top = 34.0
-margin_right = 400.0
+margin_right = 600.0
 margin_bottom = 58.0
 
 [node name="Label" type="Label" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2"]
 margin_top = 2.0
-margin_right = 322.0
+margin_right = 522.0
 margin_bottom = 21.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "FOV"
 
 [node name="InputFOV" type="SpinBox" parent="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 326.0
-margin_right = 400.0
+margin_left = 526.0
+margin_right = 600.0
 margin_bottom = 24.0
 min_value = 60.0
 max_value = 120.0
@@ -257,45 +309,45 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/Video/ScrollContainer"]
-margin_right = 500.0
-margin_bottom = 331.0
+margin_right = 600.0
+margin_bottom = 381.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 10
 
 [node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer"]
-margin_right = 400.0
+margin_right = 600.0
 margin_bottom = 40.0
 
 [node name="Label" type="Label" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer8"]
 margin_top = 10.0
-margin_right = 320.0
+margin_right = 520.0
 margin_bottom = 29.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "Fullscreen"
 
 [node name="InputFullscreen" type="CheckButton" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer8"]
-margin_left = 324.0
-margin_right = 400.0
+margin_left = 524.0
+margin_right = 600.0
 margin_bottom = 40.0
 
 [node name="HBoxContainer9" type="HBoxContainer" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer"]
 margin_top = 50.0
-margin_right = 400.0
+margin_right = 600.0
 margin_bottom = 90.0
 
 [node name="Label" type="Label" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer9"]
 margin_top = 10.0
-margin_right = 320.0
+margin_right = 520.0
 margin_bottom = 29.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "MSAA"
 
 [node name="InputMSAA" type="CheckButton" parent="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer9"]
-margin_left = 324.0
-margin_right = 400.0
+margin_left = 524.0
+margin_right = 600.0
 margin_bottom = 40.0
 
 [node name="Audio" type="Tabs" parent="CenterContainer/TabContainer"]
@@ -316,26 +368,26 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/Audio/ScrollContainer2"]
-margin_right = 500.0
-margin_bottom = 331.0
+margin_right = 600.0
+margin_bottom = 381.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 10
 
 [node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer"]
-margin_right = 400.0
+margin_right = 600.0
 margin_bottom = 19.0
 
 [node name="Label" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8"]
-margin_right = 130.0
+margin_right = 197.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "Sound Volume"
 
 [node name="InputSoundVolumeText" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8"]
-margin_left = 134.0
-margin_right = 264.0
+margin_left = 201.0
+margin_right = 398.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
@@ -343,26 +395,26 @@ text = "20"
 align = 1
 
 [node name="InputSoundVolume" type="HSlider" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8"]
-margin_left = 268.0
-margin_right = 400.0
+margin_left = 402.0
+margin_right = 600.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
 
 [node name="HBoxContainer9" type="HBoxContainer" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer"]
 margin_top = 29.0
-margin_right = 400.0
+margin_right = 600.0
 margin_bottom = 48.0
 
 [node name="Label" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9"]
-margin_right = 130.0
+margin_right = 197.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "Music Volume"
 
 [node name="InputMusicVolumeText" type="Label" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9"]
-margin_left = 134.0
-margin_right = 264.0
+margin_left = 201.0
+margin_right = 398.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
@@ -370,13 +422,12 @@ text = "20"
 align = 1
 
 [node name="InputMusicVolume" type="HSlider" parent="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9"]
-margin_left = 268.0
-margin_right = 400.0
+margin_left = 402.0
+margin_right = 600.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
 
 [node name="KeyBindings" type="Tabs" parent="CenterContainer/TabContainer"]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = 19.0
@@ -393,14 +444,33 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/TabContainer/KeyBindings/ScrollContainer2"]
-margin_right = 500.0
-margin_bottom = 331.0
+margin_right = 600.0
+margin_bottom = 381.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 10
 
 [node name="HBoxContainer8" type="HBoxContainer" parent="CenterContainer/TabContainer/KeyBindings/ScrollContainer2/VBoxContainer"]
-margin_right = 500.0
+margin_right = 600.0
+margin_bottom = 25.0
+
+[node name="Label" type="Label" parent="CenterContainer/TabContainer/KeyBindings/ScrollContainer2/VBoxContainer/HBoxContainer8"]
+margin_top = 3.0
+margin_right = 298.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Move Forward"
+
+[node name="KeyInputButton" type="Button" parent="CenterContainer/TabContainer/KeyBindings/ScrollContainer2/VBoxContainer/HBoxContainer8"]
+margin_left = 302.0
+margin_right = 600.0
+margin_bottom = 25.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "W"
+flat = true
+script = SubResource( 6 )
 
 [node name="Save and Close" type="Tabs" parent="CenterContainer/TabContainer"]
 visible = false
@@ -416,10 +486,10 @@ __meta__ = {
 }
 
 [node name="CloseBtn" type="Button" parent="CenterContainer/TabContainer/Save and Close/CenterContainer"]
-margin_left = 129.0
-margin_top = 153.0
-margin_right = 371.0
-margin_bottom = 178.0
+margin_left = 179.0
+margin_top = 178.0
+margin_right = 421.0
+margin_bottom = 203.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/font = ExtResource( 1 )
@@ -429,10 +499,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 [connection signal="toggled" from="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer8/InputShowFPS" to="." method="_on_InputShowFPS_toggled"]
+[connection signal="toggled" from="CenterContainer/TabContainer/General/ScrollContainer2/VBoxContainer/HBoxContainer9/InputShowVEL" to="." method="_on_InputShowVEL_toggled"]
 [connection signal="value_changed" from="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer/InputSensitivity" to="." method="_on_InputSensitivity_value_changed"]
 [connection signal="value_changed" from="CenterContainer/TabContainer/Player/ScrollContainer/VBoxContainer/HBoxContainer2/InputFOV" to="." method="_on_InputFOV_value_changed"]
 [connection signal="toggled" from="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer8/InputFullscreen" to="." method="_on_InputFullscreen_toggled"]
 [connection signal="toggled" from="CenterContainer/TabContainer/Video/ScrollContainer/VBoxContainer/HBoxContainer9/InputMSAA" to="." method="_on_InputMSAA_toggled"]
 [connection signal="value_changed" from="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer8/InputSoundVolume" to="." method="_on_InputSoundVolume_value_changed"]
 [connection signal="value_changed" from="CenterContainer/TabContainer/Audio/ScrollContainer2/VBoxContainer/HBoxContainer9/InputMusicVolume" to="." method="_on_InputMusicVolume_value_changed"]
+[connection signal="toggled" from="CenterContainer/TabContainer/KeyBindings/ScrollContainer2/VBoxContainer/HBoxContainer8/KeyInputButton" to="CenterContainer/TabContainer/KeyBindings/ScrollContainer2/VBoxContainer/HBoxContainer8/KeyInputButton" method="_on_KeyInputButton_toggled"]
 [connection signal="pressed" from="CenterContainer/TabContainer/Save and Close/CenterContainer/CloseBtn" to="." method="_on_CloseBtn_pressed"]

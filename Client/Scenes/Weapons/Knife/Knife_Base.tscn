@@ -26,9 +26,10 @@ points = PoolVector3Array( -0.0046445, -0.006069, -0.00588843, -0.0046445, -0.00
 [sub_resource type="ConvexPolygonShape" id=5]
 points = PoolVector3Array( -0.000912737, -0.0048, -0.00427253, -0.000912737, -0.0048, 0.00346067, -0.000887434, 0.0213832, 0.00335946, -0.000887434, 0.0225387, 0.00220299, -0.000887434, 0.0277445, -0.00415445, -0.000887434, 0.0277445, -0.00357621, -0.000309311, -0.00433194, 0.0039377, -0.000309311, 0.0213832, 0.0039377, -0.000309311, 0.0257162, -0.000685822, -0.000309311, 0.0277445, -0.00299798, 0.000268304, -0.00433194, 0.0039377, 0.000268304, 0.0213832, 0.0039377, 0.000268304, 0.0228275, 0.0024921, 0.000268304, 0.026005, -0.000974148, 0.000268304, 0.0277445, -0.00299798, 0.000846597, -0.00433194, -0.00415445, 0.000846597, 0.0213832, 0.00335946, 0.000846597, 0.0228275, 0.00191466, 0.000846597, 0.0277445, -0.00415445, 0.000846597, 0.0277445, -0.00357621, 0.0008719, -0.0048, 0.00346067 )
 
-[sub_resource type="Animation" id=6]
-length = 0.4
-step = 0.05
+[sub_resource type="Animation" id=8]
+resource_name = "alternate_swing"
+length = 0.6
+step = 0.01
 tracks/0/type = "value"
 tracks/0/path = NodePath("Spatial/Blade:rotation_degrees")
 tracks/0/interp = 1
@@ -36,43 +37,56 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4 ),
-"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"times": PoolRealArray( 0, 0.35, 0.6 ),
+"transitions": PoolRealArray( 2.54912, 0.574349, 1 ),
 "update": 0,
-"values": [ Vector3( -45, -30, 0 ), Vector3( 7.64719, -111.218, -75.1833 ), Vector3( 43.0647, -59.5081, 53.1707 ), Vector3( 22.391, -87.7873, 1.6892 ), Vector3( -45, -30, 0 ) ]
+"values": [ Vector3( -26.756, 306.509, 33.788 ), Vector3( -75.224, 307.919, -28.631 ), Vector3( -26.756, 306.509, 33.788 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Spatial/Blade:translation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.1, 0.35, 0.6 ),
+"transitions": PoolRealArray( 2.54912, 2.54912, 0.574349, 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ), Vector3( 0, 0, 0 ), Vector3( 0.0479718, -0.0250907, -0.0154538 ), Vector3( 0, 0, 0 ) ]
 }
 
 [sub_resource type="Animation" id=7]
-length = 0.2
+length = 0.4
 step = 0.05
 tracks/0/type = "value"
-tracks/0/path = NodePath("Spatial/Blade:rotation_degrees")
+tracks/0/path = NodePath(".:rotation_degrees")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.05, 0.1, 0.15, 0.2 ),
-"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"times": PoolRealArray( 0, 0.15, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
-"values": [ Vector3( -45, -30, 0 ), Vector3( 7.43547, -76.9357, -29.1474 ), Vector3( -45.8437, -149.527, -23.9124 ), Vector3( 7.43547, -76.9357, -29.1474 ), Vector3( -45, -30, 0 ) ]
+"values": [ Vector3( 0, 0, 0 ), Vector3( -34.945, -189.486, 50.289 ), Vector3( 0, 0, 0 ) ]
 }
 
 [node name="Knife" type="Spatial" groups=[
 "knife",
 ]]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0634505, 0, 0 )
 script = ExtResource( 1 )
 shooting_sound = "knife"
 moving_spread = 0.0
 max_spraying_spread = 0.0
 
 [node name="Spatial" type="Spatial" parent="."]
-transform = Transform( 9.47714e-05, 7.07103, -7.0711, 7.0711, 4.99995, 5, 7.07103, -5.00009, -4.99995, 0.15, 0.1, -0.1 )
+transform = Transform( -1.2275, 6.05244, -7.86518, 6.46919, 6.49798, 3.99071, 7.52614, -4.59827, -4.71307, 0.171809, 0.0750536, -0.1 )
 
 [node name="Blade" type="KinematicBody" parent="Spatial" groups=[
 "knife",
 ]]
-transform = Transform( 0.866025, 0.353553, -0.353553, 0, 0.707106, 0.707106, 0.5, -0.612372, 0.612372, 0, 0, 0 )
+transform = Transform( 0.695695, -0.0301319, -0.717707, 0.496579, 0.742117, 0.450192, 0.519057, -0.669594, 0.53125, 0, 0, 0 )
 collision_layer = 4
 collision_mask = 8
 script = SubResource( 1 )
@@ -88,13 +102,14 @@ shape = SubResource( 2 )
 shape = SubResource( 3 )
 
 [node name="CollisionShape2" type="CollisionShape" parent="Spatial/Blade"]
+transform = Transform( 1, -1.49012e-08, -4.17931e-08, 0, 1, 9.31323e-09, -2.07219e-08, -4.65661e-09, 1, 0, 0, 0 )
 shape = SubResource( 4 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Spatial/Blade"]
 shape = SubResource( 5 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/alternate_swing = SubResource( 6 )
+anims/alternate_swing = SubResource( 8 )
 anims/swing = SubResource( 7 )
 
 [node name="RecoilResetTimer" type="Timer" parent="."]

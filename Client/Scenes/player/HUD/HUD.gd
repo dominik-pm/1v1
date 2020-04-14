@@ -4,8 +4,6 @@ onready var player = $"../"
 onready var ammo = $WeaponSlots/VBoxContainer/Ammo/AmmoLabel
 onready var bullet_icon = $WeaponSlots/VBoxContainer/Ammo/BulletIcon
 onready var healthbar = $HealthBar
-onready var kill_count_label = $VBoxContainer/Stats/KillsDeaths/Kills/KillCountLabel
-onready var death_count_label = $VBoxContainer/Stats/KillsDeaths/Deaths/DeathCountLabel
 onready var fps_count_label = $VBoxContainer/Top/FPSCountLabel
 onready var slots = $WeaponSlots
 onready var dmg_indicator = $DamageIndicator
@@ -14,7 +12,8 @@ onready var scope_overlay = $Scope
 onready var crosshair = $Crosshair
 onready var fps_timer = $UpdateFPSTimer
 onready var game_menu = $GameMenu
-onready var killfeed = $Killfeed
+onready var vel_label = $VelocityLabel
+onready var vel_timer = $VelocityLabel/VelCheckingInterval
 
 
 var menu_open = false
@@ -22,10 +21,8 @@ var menu_open = false
 func _ready():
 	game_menu.hide_menu()
 	unscope()
-	if settings.get_setting("general", "show_fps"):
-		show_fps()
-	else: 
-		hide_fps()
+	show_fps(settings.get_setting("general", "show_fps"))
+	show_velocity(settings.get_setting("general", "show_vel"))
 
 func init_weapons(weapons):
 	slots.init_icons(weapons)
@@ -75,14 +72,8 @@ func update_weapon(index):
 func update_health(health):
 	healthbar.value = health
 
-func update_kill_count(kill_count):
-	kill_count_label.text = str(kill_count)
-
-func update_death_count(death_count):
-	death_count_label.text = str(death_count)
-
-func update_killfeed(killer, victim):
-	killfeed.update_feed(killer, victim)
+#func update_killfeed(killer, victim):
+#	killfeed.update_feed(killer, victim)
 
 func _input(event):
 	if event.is_action_pressed("toggle_menu"):
@@ -105,10 +96,8 @@ func close_game_menu():
 	player.can_move = true
 	menu_open = false
 	game_menu.hide_menu()
-	if settings.get_setting("general", "show_fps"):
-		show_fps()
-	else: 
-		hide_fps()
+	show_fps(settings.get_setting("general", "show_fps"))
+	show_velocity(settings.get_setting("general", "show_vel"))
 
 func scope():
 	scope_overlay.visible = true
@@ -117,15 +106,25 @@ func unscope():
 	scope_overlay.visible = false
 	crosshair.visible = true
 
+func show_fps(is_on):
+	fps_count_label.visible = is_on
+	if is_on:
+		update_fps()
+		fps_timer.start()
+	else:
+		fps_timer.stop()
 func update_fps():
 	fps_count_label.text = "FPS: " + str(Engine.get_frames_per_second())
-func show_fps():
-	update_fps()
-	fps_count_label.visible = true
-	fps_timer.start()
-func hide_fps():
-	fps_count_label.visible = false
-	fps_timer.stop()
-
 func _on_UpdateFPSTimer_timeout():
 	update_fps()
+
+func show_velocity(is_on):
+	vel_label.visible = is_on
+	if is_on:
+		vel_timer.start()
+	else:
+		vel_timer.stop()
+func _on_VelCheckingInterval_timeout():
+	var xvel = player.vel.x
+	var zvel = player.vel.z
+	vel_label.text = str(int((xvel*xvel)+(zvel*zvel)))

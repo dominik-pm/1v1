@@ -1,9 +1,19 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Game/game.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Fonts/grobold_16.tres" type="DynamicFont" id=2]
 [ext_resource path="res://UI/GameMenu.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/HUD/ServerHUD.tscn" type="PackedScene" id=4]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+func _ready():
+	Global.set_messenger(self)
+
+func message(msg):
+	$MessageText.text += \"\\n\" + str(msg)
+"
 
 [node name="Game" type="Node"]
 script = ExtResource( 1 )
@@ -12,9 +22,13 @@ script = ExtResource( 1 )
 process_mode = 0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -1
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 anchor_bottom = 1.0
+margin_right = 169.0
+rect_min_size = Vector2( 100, 0 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -24,9 +38,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 custom_fonts/font = ExtResource( 2 )
 text = "Status messages:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="GameMenu" parent="." instance=ExtResource( 3 )]
-visible = false
 
 [node name="ServerHUD" parent="." instance=ExtResource( 4 )]
 [connection signal="timeout" from="TickrateTimer" to="." method="_on_TickrateTimer_timeout"]
+[connection signal="visibility_changed" from="GameMenu" to="GameMenu" method="_on_GameMenu_visibility_changed"]

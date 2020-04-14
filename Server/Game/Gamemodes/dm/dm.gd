@@ -1,6 +1,6 @@
 extends Gamemode
 
-const ROUND_TIME = 120 # (seconds)
+const ROUND_TIME = 30 # (seconds)
 var timer
 var leader_pid = null
 
@@ -13,25 +13,29 @@ func _ready():
 	add_child(timer)
 	timer.start()
 
-func init_data(pid):
-	player_data[pid].kills = 0
+# dont need additional data
+#func init_data(pid):
+#	pass
 
 func start_game():
+	update_scoreboard()
+	game.start_timer(ROUND_TIME)
 	for pid in player_data:
-		game.respawn_player(pid, get_random_spawn_loc())
+		game.reset_player(pid, get_random_spawn_loc())
 
 func player_died(pid):
-	game.respawn_player(pid, get_random_spawn_loc())
+	player_data[pid].deaths += 1
+	game.reset_player(pid, get_random_spawn_loc())
 
 func player_kill(pid):
 	player_data[pid].kills += 1
 	update_leaderboard()
-
+	update_scoreboard()
 func player_killed_himself(pid):
-	game.remove_kills(pid, 1)
 	player_data[pid].kills -= 1
 	update_leaderboard()
-	
+	update_scoreboard()
+
 
 func _on_Roundtime_ended():
 	# check if there is a winner

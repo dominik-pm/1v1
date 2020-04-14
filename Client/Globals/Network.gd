@@ -1,6 +1,6 @@
 extends Node
 
-const DEFAULT_IP = '91.114.179.164'
+const DEFAULT_IP = '127.0.0.1'
 const DEFAULT_PORT = 31400
 
 var menu = null
@@ -26,13 +26,13 @@ func init_menu(m):
 
 # - NETWORK SIGNALS ->
 func _connection_failed():
-	message_menu("connection failed")
+	Global.message("connection failed")
 	peer.close_connection()
 
 func _connected_to_server():
 	current_state = STATE.connected
 	menu.connected()
-	rpc_id(1, "connected_client", local_id, nickname)
+	rpc_id(1, "connect_client", local_id, nickname)
 
 remote func get_connected_clients(clients):
 	Global.clients = clients
@@ -42,7 +42,7 @@ remote func other_player_connected(id, nickname):
 	Global.clients[id].id = id
 	
 	if local_id != id:
-		message_menu(str(nickname) + " connected to the server!")
+		Global.message(str(nickname) + " connected to the server!")
 
 remote func other_player_disconnected(id):
 	var nickname = Global.clients[id].nickname
@@ -50,7 +50,7 @@ remote func other_player_disconnected(id):
 	
 	
 	if current_state != STATE.in_game:
-		message_menu(str(nickname) + " disconnected from the server!")
+		Global.message(str(nickname) + " disconnected from the server!")
 # <- NETWORK SIGNALS -
 
 
@@ -63,7 +63,7 @@ func connect_to_server(player_nickname, custom_ip = null):
 	if custom_ip != null:
 		ip = custom_ip
 	
-	message_menu("Trying to connect to " + str(ip) + ":" + str(DEFAULT_PORT) + "...")
+	Global.message("Trying to connect to " + str(ip) + ":" + str(DEFAULT_PORT) + "...")
 	
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_client(ip, DEFAULT_PORT)
@@ -84,23 +84,18 @@ func disconnect_from_server():
 
 # - SERVER CALLED ->
 remote func start_game_in(time):
-	message_menu("Starting the game in " + str(time) + " seconds!")
-remote func load_map(map_name):
+	Global.message("Starting the game in " + str(time) + " seconds!")
+remote func load_map(map):
 	current_state = STATE.in_game
 	# change the scene to the selected map
-	get_tree().change_scene_to(Maps.scenes[map_name])
-remote func game_ended():
+	get_tree().change_scene_to(Maps.scenes[map])
+remote func game_canceled():
 	current_state = STATE.connected
-	get_tree().change_scene_to(Global.menu_scene)
+	Global.message("Game got cancelled by the server :(")
 remote func close_server():
 	current_state = STATE.disconnected
 	get_tree().change_scene_to(Global.menu_scene)
 	yield(get_tree().create_timer(0.5), "timeout")
-	message_menu("Server has been closed!")
+	Global.message("Server has been closed!")
 # <- SERVER CALLED -
 
-
-func message_menu(msg):
-	if current_state != STATE.in_game:
-		if menu.has_method("message"):
-			menu.message(msg)

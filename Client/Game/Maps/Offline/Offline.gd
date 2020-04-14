@@ -9,6 +9,7 @@ func _ready():
 		id = 99, 
 		position = Vector3(0,3,0), 
 		rotation = Vector3(0,0,0), 
-		headrotation = Vector3(0,0,0)
+		headrotation = Vector3(0,0,0),
+		weapons = ["m4", "pistol"]
 	} 
 	player.init(info)

@@ -3,6 +3,7 @@ extends KinematicBody
 class_name PuppetPlayer
 
 var preloaded_death_effect = preload("res://Scenes/Effects/DeathExplosion.tscn")
+var preloaded_ragdoll = preload("res://Scenes/Effects/Ragdoll.tscn")
 var preload_bullet = preload("res://Scenes/Weapons/Bullet/Bullet.tscn")
 
 onready var anim = $AnimationPlayer
@@ -57,7 +58,9 @@ func init(info):
 	headbone = skel.find_bone("Head")
 	initial_head_transform = skel.get_bone_pose(headbone)
 	
-	#hand.init(weapons)
+	var w = info.weapons
+	w.push_back("knife")
+	hand.init(w)
 	
 	update(info)
 	
@@ -65,7 +68,10 @@ func init(info):
 	$NameTag.set_name(Global.clients[info.id].nickname)
 	healthbar.update(health)
 
-func spectate(is_spectating):
+func set_spectate(is_spectating):
+	var c = get_viewport().get_camera()
+	if c != null:
+		c.current = false
 	camera.current = is_spectating
 	$Armature/Skeleton/Character.visible = !is_spectating
 
@@ -220,6 +226,17 @@ func die():
 	var deatheffect = preloaded_death_effect.instance()
 	get_tree().root.add_child(deatheffect)
 	deatheffect.global_transform.origin = $Center.global_transform.origin
+	
+	# add a ragdoll
+	var ragdoll = preloaded_ragdoll.instance()
+	ragdoll.rotation = rotation
+	ragdoll.init(global_transform.origin)
+	get_tree().root.add_child(ragdoll)
+	
+	queue_free()
+
+func remove():
+	queue_free()
 
 func respawn(pos):
 	health = max_health

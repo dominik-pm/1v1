@@ -10,18 +10,20 @@ var can_fire = true
 var reloading = false
 var play_anim = false
 
-var player
+var player = null
 var hud
 
 func _ready():
 	currently_switching = false
-	player = get_node(player_path)
 
 func init(weapons):
-	hud = get_parent().hud
+	player = get_node(player_path)
+	if player is PuppetPlayer:
+		pass
+	else:
+		hud = player.hud
 	
 	add_weapons(weapons)
-	
 	update_ammo_on_hud()
 	
 	play_anim = true
@@ -273,10 +275,13 @@ func fire_from_pos(pos, dir):
 	can_fire = true
 
 func update_ammo_on_hud():
-	if selected_weapon != null:
-		hud.update_ammo(selected_weapon, reloading)
+	if player is PuppetPlayer:
+		pass
 	else:
-		hud.hide_ammo()
+		if selected_weapon != null:
+			hud.update_ammo(selected_weapon, reloading)
+		else:
+			hud.hide_ammo()
 
 
 func get_spread(dir, vel):

@@ -1,9 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scenes/player/HUD/Killfeed/KillfeedEntry.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/player/HUD/Killfeed/KillfeedEntry.tscn" type="PackedScene" id=2]
 
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
 export var MAX_FEED_SIZE = 5
@@ -38,7 +37,7 @@ anchor_right = 1.0
 margin_left = -320.0
 margin_bottom = 128.0
 rect_min_size = Vector2( 320, 128 )
-script = SubResource( 8 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -53,13 +52,4 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="KillfeedEntry" type="HBoxContainer" parent="VBoxContainer" instance=ExtResource( 2 )]
-margin_right = 310.0
-margin_bottom = 24.0
-size_flags_horizontal = 3
-custom_constants/separation = 10
-alignment = 2
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="KillfeedEntry" parent="VBoxContainer" instance=ExtResource( 2 )]

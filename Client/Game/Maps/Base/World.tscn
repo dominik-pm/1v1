@@ -3,7 +3,7 @@
 [ext_resource path="res://Game/Maps/Base/World.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Environments/EnvironmentMorning.tres" type="Environment" id=2]
 
-[sub_resource type="GIProbeData" id=6]
+[sub_resource type="GIProbeData" id=1]
 bounds = AABB( -25, -10, -25, 50, 20, 50 )
 cell_size = 0.390625
 to_cell_xform = Transform( 2.56, 0, 0, 0, 2.56, 0, 0, 0, 2.56, 64, 25.6, 64 )
@@ -40,7 +40,7 @@ shadow_bias = -0.24
 
 [node name="GIProbe" type="GIProbe" parent="."]
 extents = Vector3( 12.85, 10.35, 12.4 )
-data = SubResource( 6 )
+data = SubResource( 1 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource( 2 )

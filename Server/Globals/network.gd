@@ -7,18 +7,19 @@ var peer = null
 
 var current_state
 enum STATE {
-	offline = 0
-	online =  1,
-	in_game = 2,
+	offline =    0,
+	online =     1,
+	in_game =    2,
+	game_ended = 3
 }
 
 # default settings
 var SETTINGS = {
 	"DEFAULT_IP": '91.114.179.164',
 	"DEFAULT_PORT": 31400,
-	"TIME_TO_START": 3,
+	"TIME_TO_START": 1,
 	"MAX_PLAYERS": 3,
-	"MAP": "Map1",
+	"MAP": 0,
 	"GAMEMODE": 0
 }
 
@@ -58,12 +59,12 @@ remote func connect_client(id, nickname):
 	
 	rpc_id(id, "get_connected_clients", Global.clients)
 	rpc("other_player_connected", id, nickname)
-	message_menu(str(nickname) + "("+str(id)+") connected!")
+	Global.message(str(nickname) + "("+str(id)+") connected!")
 
 func _on_client_disconnected(id):
 	var nickname = Global.clients[id].nickname
 	rpc("other_player_disconnected", id)
-	message_menu(str(nickname) + " ("+str(id)+") disconnected!")
+	Global.message(str(nickname) + " ("+str(id)+") disconnected!")
 	
 	var game = get_node(Global.game_path)
 	if game != null:
@@ -85,18 +86,21 @@ func create_server():
 	# check if it worked (does not work if server already running)
 	if check == OK:
 		get_tree().set_network_peer(peer)
-		message_menu("Server created on "+SETTINGS["DEFAULT_IP"]+":"+str(SETTINGS["DEFAULT_PORT"])+"!")
+		Global.message("Server created on "+SETTINGS["DEFAULT_IP"]+":"+str(SETTINGS["DEFAULT_PORT"])+"!")
 		menu.server_created()
 		current_state = STATE.online
 	else:
 		peer = null
-		message_menu("Could not create server. There already is an open connection!")
+		Global.message("Could not create server. There already is an open connection!")
 
 func close_server():
 	if peer != null:
+		if get_tree().current_scene.name != "MainMenu":
+			get_tree().change_scene_to(Global.menu_scene)
+		
 		rpc("close_server")
 		current_state = STATE.offline
-		message_menu("Closing the server...")
+		Global.message("Closing the server...")
 		yield(get_tree().create_timer(0.5), "timeout")
 		peer.close_connection()
 		yield(get_tree().create_timer(0.5), "timeout")
@@ -106,8 +110,6 @@ func close_server():
 		print("not running")
 
 func quit():
-	if get_tree().current_scene.name != "MainMenu":
-		get_tree().change_scene_to(Global.menu_scene)
 	close_server()
 	yield(get_tree().create_timer(1.0), "timeout")
 	get_tree().quit()
@@ -130,23 +132,17 @@ func start_game():
 			for pid in player_ids:
 				rpc_id(pid, "load_map", SETTINGS["MAP"])
 		else:
-			message_menu("No Players connected!")
+			Global.message("No Players connected!")
 	else:
-		message_menu("Server not running!")
+		Global.message("Server not running!")
 
-func end_game():
-	rpc("game_ended")
-	get_tree().change_scene_to(Global.menu_scene)
-
-func message_menu(msg):
-	if current_state != STATE.in_game:
-		if menu.has_method("message"):
-			menu.message(msg)
+func game_cancelled():
+	rpc("game_cancelled")
 
 # end the progress in game
 #func end_game():
 #	rpc('close_game')
-#	message_menu("game ended")
+#	Global.message("game ended")
 #	yield(get_tree().create_timer(0.5), "timeout")
 
 #func get_status():

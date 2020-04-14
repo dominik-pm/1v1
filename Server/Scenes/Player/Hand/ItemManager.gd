@@ -13,14 +13,12 @@ var player
 var hud
 
 func _ready():
-	player = get_node(player_path)
+	pass
 
 func init(weapons):
-	hud = get_parent().hud
-	
+	player = get_node(player_path)
 	add_weapons(weapons)
-	
-	update_ammo_on_hud()
+	#update_ammo_on_hud()
 	
 	play_anim = true
 	
@@ -102,6 +100,9 @@ func update_weapon(index):
 	# tell the player (animations and sound)
 	player.switching_weapons(index)
 	
+	if get_child(index).get_child_count() > 0:
+		selected_weapon = get_child(index).get_child(0)
+		
 	# select the new weapon after half of the drawing time
 	yield(get_tree().create_timer(0.25), "timeout")
 	
@@ -272,6 +273,8 @@ func fire(pos, dir):
 	can_fire = true
 
 func update_ammo_on_hud():
+	return
+	
 	if selected_weapon != null:
 		hud.update_ammo(selected_weapon, reloading)
 	else:

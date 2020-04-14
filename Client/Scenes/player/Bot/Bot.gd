@@ -1,6 +1,14 @@
 extends Player
 
-func init(n, weapons):
+class_name Bot
+
+var death_explosion = preload("res://Scenes/Effects/DeathExplosion.tscn")
+var ragdoll = preload("res://Scenes/Effects/Ragdoll.tscn")
+
+func _ready():
+	init(3)
+
+func init(i):
 	self.connect("request_camera_shake", cam, "_on_camera_shake_requested")
 	self.connect("request_camera_recoil", cam, "_on_camera_recoil_requested")
 	
@@ -12,7 +20,9 @@ func init(n, weapons):
 	$NameTag.set_name(name)
 	$HealthBar.update(health)
 	
-	hand.init(weapons)
+	var weapons = ["m4", "pistol", "knife"]
+	data.weapons = weapons
+	hand.init(data.weapons)
 
 func update_settings():
 	pass
@@ -22,6 +32,10 @@ func clamp_aim():
 
 func aim(event):
 	pass
+
+func _input(event):
+	if event.is_action_pressed("ui_left"):
+		die()
 
 func get_action(event):
 	pass
@@ -72,13 +86,13 @@ func get_input(delta):
 	
 	if jumping:
 		# in air
-		speed = running_speed
+		speed = AIR_STRAVE_SPEED
 	else:
 		# on floor
 		if crouching:
 			speed = crouching_speed
 		else:
-			speed = running_speed
+			speed = RUNNING_SPEED
 	
 	
 	# apply the velocity
@@ -123,25 +137,34 @@ func get_input(delta):
 	var current_head_transform = initial_head_transform.rotated(Vector3(-1, 0, 0), -cam.rotation.x)
 	skel.set_bone_pose(headbone, current_head_transform)
 
-func get_damage(amt, player_fired, bodypart):
-	if player_fired != name:
-		print("My " + str(bodypart) + " just got hit!")
-		
-		# logic
-		var d = amt
-		if bodypart == "head":
-			d *= HEADSHOT_MULTIPLIER
-		elif bodypart == "body":
-			d *= BODYSHOT_MULTIPLIER
-		elif bodypart == "limb":
-			d *= LIMBSHOT_MULTIPLIER
-		health -= d
-		if health <= 0:
-			health = 0
-			die(player_fired)
-		
-		$HealthBar.update(health)
+func get_damage(amt):
+	# logic
+	health -= amt
+	$HealthBar.update(health)
+	if health <= 0:
+		health = 0
+		die()
+	
 
+func die():
+	# effects
+	var deatheffect = death_explosion.instance()
+	get_tree().root.add_child(deatheffect)
+	deatheffect.global_transform.origin = $Center.global_transform.origin
+	
+	# add a ragdoll
+	var rd = ragdoll.instance()
+	rd.rotation = rotation
+	rd.init(global_transform.origin)
+	get_tree().root.add_child(rd)
+	
+	# respawn
+	respawn(Vector3(0, 3, 0))
+
+func respawn(pos):
+	health = max_health
+	hand.reset(data.weapons)
+	global_transform.origin = pos
 func switch_weapons():
 	switching_weapons = true
 	$HandAnimation.play("switch_weapon")

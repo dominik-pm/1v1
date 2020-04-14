@@ -1,11 +1,19 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Assets/Fonts/grobold_32.tres" type="DynamicFont" id=1]
+[ext_resource path="res://UI/SettingsMenu.tscn" type="PackedScene" id=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
+onready var end_btn = $CenterContainer/VBoxContainer/EndGame
+onready var start_btn = $CenterContainer/VBoxContainer/StartGame
+onready var close_btn = $CenterContainer/VBoxContainer/CloseServer
+
+var game
+
 func _ready():
+	game = get_parent()
 	visible = false
 
 func _input(event):
@@ -13,10 +21,33 @@ func _input(event):
 		visible = !visible
 
 func _on_EndGame_pressed():
-	Network.end_game()
+	Network.current_state = Network.STATE.game_ended
+	game.game_ended()
+	Global.message(\"Game cancelled by the server!\")
+	Network.game_cancelled()
+	update_button_disability()
+
+func _on_StartGame_pressed():
+	Network.start_game()
 
 func _on_CloseServer_pressed():
 	Network.quit()
+
+func _on_GameMenu_visibility_changed():
+	if visible:
+		update_button_disability()
+
+func update_button_disability():
+	# enable all
+	end_btn.disabled = false
+	start_btn.disabled = false
+	close_btn.disabled = false
+	
+	# disable some depending on the game state
+	if Network.current_state == Network.STATE.in_game:
+		start_btn.disabled = true
+	elif Network.current_state == Network.STATE.game_ended:
+		end_btn.disabled = true
 "
 
 [node name="GameMenu" type="Control"]
@@ -35,24 +66,35 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_left = 337.0
-margin_top = 247.0
-margin_right = 687.0
-margin_bottom = 353.0
+margin_left = 376.0
+margin_top = 219.0
+margin_right = 647.0
+margin_bottom = 380.0
 
 [node name="EndGame" type="Button" parent="CenterContainer/VBoxContainer"]
-margin_right = 350.0
+margin_right = 271.0
 margin_bottom = 51.0
 custom_fonts/font = ExtResource( 1 )
 text = "End Game"
 flat = true
 
-[node name="CloseServer" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="StartGame" type="Button" parent="CenterContainer/VBoxContainer"]
 margin_top = 55.0
-margin_right = 350.0
+margin_right = 271.0
 margin_bottom = 106.0
 custom_fonts/font = ExtResource( 1 )
-text = "Close Server and Quit"
+text = "Start Next Game"
 flat = true
+
+[node name="CloseServer" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 110.0
+margin_right = 271.0
+margin_bottom = 161.0
+custom_fonts/font = ExtResource( 1 )
+text = "Close Server"
+flat = true
+
+[node name="SettingsMenu" parent="." instance=ExtResource( 2 )]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/EndGame" to="." method="_on_EndGame_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/StartGame" to="." method="_on_StartGame_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/CloseServer" to="." method="_on_CloseServer_pressed"]

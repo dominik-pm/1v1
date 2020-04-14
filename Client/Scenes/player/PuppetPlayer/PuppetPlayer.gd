@@ -3,6 +3,7 @@ extends KinematicBody
 class_name PuppetPlayer
 
 var preloaded_death_effect = preload("res://Scenes/Effects/DeathExplosion.tscn")
+var preloaded_ragdoll = preload("res://Scenes/Effects/Ragdoll.tscn")
 var preload_bullet = preload("res://Scenes/Weapons/Bullet/Bullet.tscn")
 
 onready var anim = $AnimationPlayer
@@ -41,7 +42,6 @@ var max_grav = -60
 # <- movement -
 
 # - PvP ->
-var kills = 0
 var max_health = 100
 var health = max_health
 # <- PvP -
@@ -56,13 +56,19 @@ func init(info):
 	headbone = skel.find_bone("Head")
 	initial_head_transform = skel.get_bone_pose(headbone)
 	
-	#hand.init(weapons)
+	var w = info.weapons
+	w.push_back("knife")
+	hand.init(w)
 	
 	update(info)
 	
 	name = str(info.id)
 	$NameTag.set_name(name)
 	$HealthBar.update(health)
+
+func set_spectate(is_spectating):
+	camera.current = is_spectating
+	$Armature/Skeleton/Character.visible = !is_spectating
 
 var last_anim = ""
 func update(info):
@@ -189,6 +195,14 @@ func die():
 	var deatheffect = preloaded_death_effect.instance()
 	get_tree().root.add_child(deatheffect)
 	deatheffect.global_transform.origin = $Center.global_transform.origin
+	
+	# add a ragdoll
+	var ragdoll = preloaded_ragdoll.instance()
+	ragdoll.rotation = rotation
+	ragdoll.init(global_transform.origin)
+	get_tree().root.add_child(ragdoll)
+	
+	queue_free()
 
 func is_sound_playing(sound_name : String):
 	var audioplayer = null
@@ -201,10 +215,6 @@ func is_sound_playing(sound_name : String):
 
 func sound_emit(sound_name : String):
 	play_sound(sound_name)
-	#if global.is_offline:
-	#	play_sound(sound_name)
-	#else:
-	#	global.rpc_id(1, "play_sound", sound_name, name)
 
 func play_sound(sound_name : String):
 	var audioplayer = null

@@ -570,7 +570,7 @@ visible = false
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.4, 0 )
 visible = false
 
-[node name="Camera" type="Spatial" parent="."]
+[node name="Camera" type="Camera" parent="."]
 transform = Transform( 4, -1.17457e-20, 1.13687e-13, -6.77626e-21, 4, 6.51682e-07, -1.13687e-13, -6.51682e-07, 4, 0, 5.8886, 0 )
 
 [node name="Hand" type="Spatial" parent="Camera"]

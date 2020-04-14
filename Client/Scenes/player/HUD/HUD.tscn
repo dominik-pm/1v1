@@ -1,24 +1,20 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://Assets/Player/crosshair.png" type="Texture" id=1]
 [ext_resource path="res://Assets/Player/sniperscope.png" type="Texture" id=2]
 [ext_resource path="res://Assets/Fonts/grobold_16.tres" type="DynamicFont" id=3]
-[ext_resource path="res://Assets/Fonts/grobold_32.tres" type="DynamicFont" id=4]
 [ext_resource path="res://Assets/Player/sync.svg" type="Texture" id=5]
-[ext_resource path="res://Assets/UI/skull.png" type="Texture" id=6]
 [ext_resource path="res://Assets/Player/damageoverlay.png" type="Texture" id=7]
 [ext_resource path="res://Scenes/player/HUD/HUD.gd" type="Script" id=8]
 [ext_resource path="res://Assets/Weapons/Icons/pistol.png" type="Texture" id=9]
 [ext_resource path="res://Assets/Weapons/Icons/knife.png" type="Texture" id=10]
 [ext_resource path="res://Assets/Weapons/Icons/m4.png" type="Texture" id=11]
-[ext_resource path="res://Assets/UI/death.png" type="Texture" id=12]
 [ext_resource path="res://Scenes/player/HUD/HealthBar.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Scenes/GameMenu/GameMenu.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Assets/Player/bullet.png" type="Texture" id=15]
-[ext_resource path="res://Scenes/player/HUD/Killfeed/Killfeed.tscn" type="PackedScene" id=16]
 [ext_resource path="res://Scenes/player/HUD/Crosshair/Crosshairline.tscn" type="PackedScene" id=18]
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
 var color_unselected = Color(0.7,0.7,0.7)
@@ -50,7 +46,7 @@ func deselect_all():
 		slot.modulate = color_unselected
 "
 
-[sub_resource type="GDScript" id=1]
+[sub_resource type="GDScript" id=2]
 script/source = "extends Label
 
 onready var reloader = $Position2D/ReloadSprite
@@ -71,8 +67,7 @@ func stop_reload():
 	reloader.visible = false
 "
 
-[sub_resource type="Animation" id=2]
-resource_name = "idle"
+[sub_resource type="Animation" id=3]
 loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath("..:rotation_degrees")
@@ -87,7 +82,7 @@ tracks/0/keys = {
 "values": [ 0.0 ]
 }
 
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id=4]
 length = 0.5
 loop = true
 tracks/0/type = "value"
@@ -104,7 +99,8 @@ tracks/0/keys = {
 }
 
 [sub_resource type="Animation" id=5]
-length = 0.5
+length = 0.4
+step = 0.05
 tracks/0/type = "value"
 tracks/0/path = NodePath("DamageIndicator:self_modulate")
 tracks/0/interp = 1
@@ -112,42 +108,34 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.2, 0.5 ),
+"times": PoolRealArray( 0, 0.15, 0.4 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
 "values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0.25 ), Color( 1, 1, 1, 0 ) ]
 }
 
-[sub_resource type="Animation" id=6]
-tracks/0/type = "value"
-tracks/0/path = NodePath("Flash:color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.2 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0.929412 ) ]
-}
-
-[sub_resource type="Animation" id=7]
-tracks/0/type = "value"
-tracks/0/path = NodePath("Flash:color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 0.901961 ), Color( 1, 1, 1, 0 ) ]
-}
-
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource( 8 )
+
+[node name="VelocityLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = 100.0
+margin_right = 20.0
+margin_bottom = 119.0
+custom_fonts/font = ExtResource( 3 )
+text = "250"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VelCheckingInterval" type="Timer" parent="VelocityLabel"]
+wait_time = 0.1
 
 [node name="Crosshair" type="Control" parent="."]
 anchor_left = 0.5
@@ -201,8 +189,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Killfeed" parent="." instance=ExtResource( 16 )]
-
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -229,76 +215,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Stats" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 32.0
-margin_right = 1920.0
-margin_bottom = 80.0
-size_flags_horizontal = 3
-custom_constants/separation = 700
-alignment = 1
-
-[node name="KillsDeaths" type="HBoxContainer" parent="VBoxContainer/Stats"]
-margin_left = 858.0
-margin_right = 1061.0
-margin_bottom = 48.0
-size_flags_vertical = 3
-custom_constants/separation = 25
-
-[node name="Kills" type="HBoxContainer" parent="VBoxContainer/Stats/KillsDeaths"]
-margin_right = 89.0
-margin_bottom = 48.0
-custom_constants/separation = 5
-
-[node name="KillIcon" type="TextureRect" parent="VBoxContainer/Stats/KillsDeaths/Kills"]
-margin_right = 48.0
-margin_bottom = 48.0
-rect_min_size = Vector2( 48, 32 )
-texture = ExtResource( 6 )
-expand = true
-stretch_mode = 6
-
-[node name="KillCountLabel" type="Label" parent="VBoxContainer/Stats/KillsDeaths/Kills"]
-margin_left = 53.0
-margin_right = 89.0
-margin_bottom = 48.0
-size_flags_horizontal = 3
-size_flags_vertical = 7
-custom_fonts/font = ExtResource( 4 )
-text = "99"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Deaths" type="HBoxContainer" parent="VBoxContainer/Stats/KillsDeaths"]
-margin_left = 114.0
-margin_right = 203.0
-margin_bottom = 48.0
-custom_constants/separation = 5
-
-[node name="DeathIcon" type="TextureRect" parent="VBoxContainer/Stats/KillsDeaths/Deaths"]
-margin_right = 48.0
-margin_bottom = 48.0
-rect_min_size = Vector2( 48, 48 )
-texture = ExtResource( 12 )
-expand = true
-stretch_mode = 6
-
-[node name="DeathCountLabel" type="Label" parent="VBoxContainer/Stats/KillsDeaths/Deaths"]
-margin_left = 53.0
-margin_right = 89.0
-margin_bottom = 48.0
-size_flags_horizontal = 3
-size_flags_vertical = 7
-custom_fonts/font = ExtResource( 4 )
-text = "99"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="WeaponSlots" type="Control" parent="."]
 anchor_left = 1.0
 anchor_top = 1.0
@@ -309,7 +225,7 @@ margin_top = -256.0
 rect_min_size = Vector2( 168, 256 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
-script = SubResource( 4 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -415,7 +331,7 @@ custom_fonts/font = ExtResource( 3 )
 text = "5 / 5"
 align = 1
 valign = 1
-script = SubResource( 1 )
+script = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -442,8 +358,8 @@ __meta__ = {
 }
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="WeaponSlots/VBoxContainer/Ammo/AmmoLabel/Position2D/ReloadSprite"]
-anims/idle = SubResource( 2 )
-anims/reload = SubResource( 3 )
+anims/idle = SubResource( 3 )
+anims/reload = SubResource( 4 )
 
 [node name="Control" type="Control" parent="WeaponSlots/VBoxContainer/Ammo"]
 margin_left = 110.0
@@ -457,7 +373,6 @@ margin_top = -49.0
 margin_bottom = -32.0
 
 [node name="DamageIndicator" type="TextureRect" parent="."]
-visible = false
 self_modulate = Color( 1, 1, 1, 0 )
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -469,8 +384,6 @@ __meta__ = {
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/damage = SubResource( 5 )
-anims/flash = SubResource( 6 )
-anims/unflash = SubResource( 7 )
 
 [node name="UpdateFPSTimer" type="Timer" parent="."]
 
@@ -478,4 +391,5 @@ anims/unflash = SubResource( 7 )
 visible = false
 margin_top = 0.630249
 margin_bottom = 0.630249
+[connection signal="timeout" from="VelocityLabel/VelCheckingInterval" to="." method="_on_VelCheckingInterval_timeout"]
 [connection signal="timeout" from="UpdateFPSTimer" to="." method="_on_UpdateFPSTimer_timeout"]

@@ -2,11 +2,18 @@ extends Node
 
 class_name Gamemode
 
-export var HEADSHOT_MULTIPLIER = 1.5
+# scores look like this
+#var scores = {
+#	"nitrogen": {
+#		"kills": 10,
+#		"deaths": 3
+#	}
+#}
+var scores = {}
+
+export var HEADSHOT_MULTIPLIER = 2.0
 export var BODYSHOT_MULTIPLIER = 1.0
 export var LIMBSHOT_MULTIPLIER = 0.8
-
-var puppet_player = preload("res://Scenes/Player/PuppetPlayer.tscn")
 
 var game = null
 var spawns_points = null
@@ -15,31 +22,24 @@ var player_data = {}
 #var player_nodes = null
 
 func _ready():
-	pass
-
-# -- Game called -->
-func init_players(players):
-	# get the nodes
+	# get some nodes
 	game = get_parent().get_node("Game")
 	spawns_points = get_parent().get_node("PlayerSpawns").get_children()
+
+# -- Game called -->
+# initialize all players that are playing in this round
+func init_player(pid):
+	# init the player_data dictionary (for gamemode stuff like: kills, round_wins, ...)
+	player_data[pid] = {id = pid}
+	player_data[pid].kills = 0
+	player_data[pid].deaths = 0
+	init_data(pid)
 	
-	# spawn players (instanciate puppet players)
-	var puppet_players_parent = get_parent().get_node("PuppetPlayers")
-	
-	#print(players)
-	for pid in players:
-		var p = players[pid]
-		player_data[pid] = {id = pid}
-		init_data(pid)
-		var new_p = puppet_player.instance()
-		puppet_players_parent.add_child(new_p)
-		new_p.init(p)
-		game.init_player(p)
-	
-	#player_nodes = puppet_players_parent.get_children()
-	
-	# tell the game that we are ready
-	game.gamemode_ready()
+	# init the scores dictionary
+	scores[Global.clients[pid].nickname] = {kills=0, deaths=0}
+
+func player_disconnected(pid):
+	player_data.erase(pid)
 
 # - OVERWRITE IN CHILD CLASS ->
 # to initialize the player_data with spawn_location, stats, etc
@@ -47,7 +47,7 @@ func init_data(pid):
 	pass
 
 func start_game():
-	pass
+	update_scoreboard()
 
 func player_died(pid):
 	pass
@@ -74,6 +74,12 @@ func player_hit_player(pid1, pid2, dmg, bodypart):
 # <- probably doesn't have to be overwritten -
 
 # <-- Game called --
+
+func update_scoreboard():
+	for pid in player_data:
+		scores[Global.clients[pid].nickname].kills = player_data[pid].kills
+		scores[Global.clients[pid].nickname].deaths = player_data[pid].deaths
+	game.update_scoreboard(scores)
 
 func game_ended():
 	game.game_ended()

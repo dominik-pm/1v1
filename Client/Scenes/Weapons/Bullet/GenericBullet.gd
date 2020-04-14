@@ -23,6 +23,8 @@ func _physics_process(delta):
 	if collision:
 		if collision.collider is BodypartHitBox:
 			hit_player()
+			if collision.collider.player is Bot:
+				collision.collider.get_damage(20)
 		else:
 			hit_world(collision.position)
 

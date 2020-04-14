@@ -2,18 +2,25 @@
 extends Node
 
 
-#const SAVE_PATH = "res://config.cfg" # in debug
-const SAVE_PATH = "user://config.cfg" # on build
+const SAVE_PATH = "res://config.cfg" # in debug
+#const SAVE_PATH = "user://config.cfg" # on build
 
 
 var config_file = ConfigFile.new()
 var settings = {
 	"general": {
-		"show_fps": true
+		"show_fps": true,
+		"show_vel": false
 	},
 	"player": {
-		"mouse_sensitivity": 1,
+		"mouse_sensitivity": 1.0,
 		"fov": 90
+	},
+	"bindings": {
+		"move_forward": "W",
+		"move_backward": "W",
+		"move_left": "W",
+		"move_right": "W",
 	},
 	"video": {
 		"fullscreen": false,
@@ -26,7 +33,8 @@ var settings = {
 }
 
 func _ready():
-	#load_settings()
+	#save_settings()
+	load_settings()
 	pass
 
 func save_settings():
