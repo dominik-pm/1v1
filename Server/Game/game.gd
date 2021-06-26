@@ -151,6 +151,13 @@ func stun_players_for(time):
 # <- Gamemode called -
 
 # - Player called ->
+remote func update_player(info):
+	if players.has(info.id):
+		# different?
+		players[info.id].position = info.position
+		players[info.id].rotation = info.rotation
+		players[info.id].headrotation = info.headrotation
+		players[info.id].animation = info.animation
 remote func shoot_bullet(p_shot_id, dir, power, dmg):
 	var puppet_player = get_puppet_player(p_shot_id)
 	if puppet_player != null:
@@ -163,13 +170,6 @@ remote func shoot_bullet(p_shot_id, dir, power, dmg):
 				rpc_id(pid, "shoot_bullet_puppet", p_shot_id, dir, power)
 	else:
 		print("shoot: puppet not instanced yet")
-remote func update_player(info):
-	if players.has(info.id):
-		# different?
-		players[info.id].position = info.position
-		players[info.id].rotation = info.rotation
-		players[info.id].headrotation = info.headrotation
-		players[info.id].animation = info.animation
 remote func knife(pid, is_alternate):
 	# tell the clients
 	for p in clients:
@@ -210,6 +210,18 @@ remote func select_weapon(pid, index):
 		p.hand.update_weapon(index)
 	else:
 		print("select weapon: puppet not instanced yet")
+remote func reload(pid):
+	# tell the clients
+	for p in clients:
+		if p != pid:
+			rpc_id(p, "reload_puppet", pid)
+	
+	# reload own puppet
+	var p = get_puppet_player(pid)
+	if p != null:
+		p.reloading()
+	else:
+		print("reload: puppet not instanced yet")
 remote func emit_sound(pid, sound_name):
 	# tell the clients
 	for p in clients:
@@ -241,8 +253,8 @@ func player_hit_player(pid1, pid2, d, bodypart):
 		# check if p2 died
 		if p2.health <= 0:
 			player_died(pid1, pid2)
-func player_died(pid1, pid2):
-	if not players_invincible:
+func player_died(pid1, pid2, force_death = false):
+	if not players_invincible or force_death:
 		var p1 = get_puppet_player(pid1)
 		var p2 = get_puppet_player(pid2)
 		
@@ -311,7 +323,11 @@ func call_rpc(method, argument):
 func get_puppet_player(pid):
 	var has_puppet = players_nodes_parent.has_node(str(pid))
 	if has_puppet:
-		return players_nodes_parent.get_node(str(pid))
+		var p = players_nodes_parent.get_node(str(pid))
+		if is_instance_valid(p):
+			return p
+		else:
+			return null
 	else:
 		return null
 	

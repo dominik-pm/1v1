@@ -5,8 +5,8 @@
 [node name="HealthBar2D" type="TextureProgress"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = -824.0
-margin_bottom = -552.0
+margin_right = -1720.0
+margin_bottom = -1054.0
 value = 50.0
 texture_progress = ExtResource( 1 )
 __meta__ = {

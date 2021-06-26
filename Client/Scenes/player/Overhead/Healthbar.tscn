@@ -19,7 +19,8 @@ texture = ExtResource( 2 )
 script = SubResource( 1 )
 
 [node name="Viewport" type="Viewport" parent="."]
-size = Vector2( 200, 26 )
+arvr = true
+size = Vector2( 400, 52 )
 transparent_bg = true
 msaa = 1
 usage = 0

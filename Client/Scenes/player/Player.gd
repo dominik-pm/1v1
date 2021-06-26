@@ -101,7 +101,7 @@ func init(info):
 	
 	sounds = {
 		"damaged": $PlayerSounds/damage.stream,
-		"reload": $PlayerSounds/reload.stream,
+		#"reload": $PlayerSounds/reload.stream,
 		"weapon_switch": $PlayerSounds/weapon_switch.stream,
 		"hit_target": $PlayerSounds/hit_target.stream
 	}
@@ -314,7 +314,8 @@ func switching_weapons(index):
 	game.switch_weapon(index) # tell the network
 
 func reloading():
-	SFX.play_sample(sounds["reload"], -20.0)
+	sound_emit("reload")
+	#SFX.play_sample(sounds["reload"], -20.0)
 	hand_anim.play("reload")
 
 func shooting(dir, power):

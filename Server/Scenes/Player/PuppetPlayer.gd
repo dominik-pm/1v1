@@ -115,13 +115,22 @@ func _physics_process(delta):
 		lerp_head_rotation()
 func lerp_movement():
 	var perc = time/time_to_lerp
-	global_transform.origin = lerp(last_pos, new_pos, perc)
+	if last_pos:
+		global_transform.origin = lerp(last_pos, new_pos, perc)
+	else:
+		global_transform.origin = new_pos
 func lerp_rotation():
 	var perc = time/time_to_lerp
-	rotation = lerp(last_rot, new_rot, perc)
+	if last_rot:
+		rotation = lerp(last_rot, new_rot, perc)
+	else:
+		rotation = new_rot
 func lerp_head_rotation():
 	var perc = time/time_to_lerp
-	camera.rotation = lerp(last_hrot, new_hrot, perc)
+	if last_hrot:
+		camera.rotation = lerp(last_hrot, new_hrot, perc)
+	else:
+		camera.rotation = new_hrot
 	var current_head_transform = initial_head_transform.rotated(Vector3(-1, 0, 0), -camera.rotation.x)
 	skel.set_bone_pose(headbone, current_head_transform)
 
@@ -133,6 +142,8 @@ func shoot(dir, power, dmg, p_shot_id):
 	var transf = muzzle.global_transform
 	b.init(transf, dir, power, dmg, p_shot_id)
 	get_tree().root.add_child(b)
+	
+	shooting()
 func knifing(is_alternate):
 	if hand.selected_weapon != null:
 		if hand.selected_weapon.item["slot"] == "KNIFE":
@@ -218,10 +229,11 @@ func jump():
 #	crouching = false
 
 # was nu ned
+func reloading():
+	sound_emit("reload")
+	hand_anim.play("reload")
 func switching_weapons(index):
 	hand_anim.play("switch_weapon")
-func reloading():
-	hand_anim.play("reload")
 func shooting():
 	hand_anim.play("shoot")
 #
@@ -238,10 +250,10 @@ func die():
 	deatheffect.global_transform.origin = $Center.global_transform.origin
 	
 	# add a ragdoll
-	var ragdoll = preloaded_ragdoll.instance()
-	ragdoll.rotation = rotation
-	ragdoll.init(global_transform.origin)
-	get_tree().root.add_child(ragdoll)
+	#var ragdoll = preloaded_ragdoll.instance()
+	#get_tree().root.add_child(ragdoll)
+	#ragdoll.init(global_transform.origin)
+	#ragdoll.rotation = rotation
 	
 	# if spectating this puppet -> tell the world to spectate another one
 	if camera.current:
@@ -266,6 +278,9 @@ func is_sound_playing(sound_name : String):
 			break
 	if audioplayer != null:
 		return audioplayer.playing
+
+func sound_emit(sound_name : String):
+	play_sound(sound_name)
 
 func play_sound(sound_name : String):
 	var audioplayer = null

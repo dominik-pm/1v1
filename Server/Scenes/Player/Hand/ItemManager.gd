@@ -3,6 +3,7 @@ extends Spatial
 export (NodePath) var player_path
 
 const WEAPON_SLOTS = 3
+const DRAWING_TIME = 0.5
 
 var selected_weapon = null
 var can_fire = true
@@ -12,8 +13,15 @@ var play_anim = false
 var player
 var hud
 
+var drawing_timer = null
+
 func _ready():
-	pass
+	# init drawing timer
+	drawing_timer = Timer.new()
+	drawing_timer.wait_time = DRAWING_TIME / 2
+	drawing_timer.one_shot = true
+	add_child(drawing_timer)
+	drawing_timer.connect("timeout", self, "_on_drawing_timer_timeout")
 
 func init(weapons):
 	player = get_node(player_path)
@@ -96,6 +104,8 @@ func select_weapon(index):
 			update_ammo_on_hud()
 	else:
 		print("no weapon available at slot " + str(index))
+
+var to_update_weapon_index = 0
 func update_weapon(index):
 	# tell the player (animations and sound)
 	player.switching_weapons(index)
@@ -103,12 +113,16 @@ func update_weapon(index):
 	if get_child(index).get_child_count() > 0:
 		selected_weapon = get_child(index).get_child(0)
 		
-	# select the new weapon after half of the drawing time
-	yield(get_tree().create_timer(0.25), "timeout")
-	
-	hide_all_items()
-	selected_weapon = get_child(index).get_child(0)
-	selected_weapon.visible = true
+	# select the new weapon after half of the drawing time#
+	#yield(get_tree().create_timer(0.25), "timeout")
+	to_update_weapon_index = index
+	drawing_timer.start()
+
+func _on_drawing_timer_timeout():
+	if is_instance_valid(self):
+		hide_all_items()
+		selected_weapon = get_child(to_update_weapon_index).get_child(0)
+		selected_weapon.visible = true
 #func select_weapon(index):
 #	if !global.is_offline:
 #		for id in Network.players:

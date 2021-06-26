@@ -61,6 +61,5 @@ func get_puppets():
 		ps.push_back(p)
 	return ps
 
-func _on_DeathArea_body_entered(body):
-	if body is PuppetPlayer:
-		game.player_died(int(body.name), int(body.name))
+func player_crossed_deatharea(pid):
+	game.player_died(int(pid), int(pid), true)

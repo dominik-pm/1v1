@@ -47,33 +47,14 @@ func knife(is_alternate):
 #	rpc_id(1, "set_weapons", player_id, weapons)
 func switch_weapon(index):
 	rpc_id(1, "select_weapon", player_id, index)
+func reload():
+	rpc_id(1, "reload", player_id)
 func emit_sound(sound_name):
 	rpc_id(1, "emit_sound", player_id, sound_name)
 # <- Tell the Server -
 
 # - Server called ->
 # to everyone
-remote func knifing(pid, is_alternate):
-	var p = get_puppet_player(pid)
-	if p != null:
-		p.knifing(is_alternate)
-	else:
-		print("knifing: player not instanced")
-#remote func set_weapons(pid, weapons):
-#	var p = get_puppet_player(pid)
-#	p.hand.add_weapons(weapons)
-remote func select_weapon(pid, index):
-	var p = get_puppet_player(pid)
-	if p != null:
-		p.hand.update_weapon(index)
-	else:
-		print("select weapons: player not instanced")
-remote func play_sound(pid, sound_name):
-	var p = get_puppet_player(pid)
-	if p != null:
-		p.play_sound(sound_name)
-	else:
-		print("play sound: player not instanced")
 remote func remove_player(pid):
 	puppet_players.erase(pid)
 	var p = get_puppet_player(pid)
@@ -135,6 +116,33 @@ remote func update_puppet_player(info):
 		new_p.init(info, tickrate)
 remote func shoot_bullet_puppet(pid, dir, power):
 	get_puppet_player(pid).shoot(dir, power)
+remote func knifing(pid, is_alternate):
+	var p = get_puppet_player(pid)
+	if p != null:
+		p.knifing(is_alternate)
+	else:
+		print("knifing: player not instanced")
+#remote func set_weapons(pid, weapons):
+#	var p = get_puppet_player(pid)
+#	p.hand.add_weapons(weapons)
+remote func select_weapon(pid, index):
+	var p = get_puppet_player(pid)
+	if p != null:
+		p.hand.update_weapon(index)
+	else:
+		print("select weapons: player not instanced")
+remote func reload_puppet(pid):
+	var p = get_puppet_player(pid)
+	if p != null:
+		p.reloading()
+	else:
+		print("reload: player not instanced")
+remote func play_sound(pid, sound_name):
+	var p = get_puppet_player(pid)
+	if p != null:
+		p.play_sound(sound_name)
+	else:
+		print("play sound: player not instanced")
 
 # spectating
 remote func spectate():

@@ -250,6 +250,7 @@ func reload():
 	if not currently_switching:
 		if selected_weapon != null and selected_weapon.item["slot"] != "KNIFE":
 			if not reloading and selected_weapon.current_ammo < selected_weapon.clip_size:
+				player.game.reload() # to tell the server
 				player.reloading() # for anim and sound
 				reloading = true
 				var reloading_weapon = selected_weapon

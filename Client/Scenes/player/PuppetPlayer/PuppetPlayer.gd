@@ -119,13 +119,22 @@ func _physics_process(delta):
 			lerp_head_rotation()
 func lerp_movement():
 	var perc = time/time_to_lerp
-	global_transform.origin = lerp(last_pos, new_pos, perc)
+	if last_pos:
+		global_transform.origin = lerp(last_pos, new_pos, perc)
+	else:
+		global_transform.origin = new_pos
 func lerp_rotation():
 	var perc = time/time_to_lerp
-	rotation = lerp(last_rot, new_rot, perc)
+	if last_rot:
+		rotation = lerp(last_rot, new_rot, perc)
+	else:
+		rotation = new_rot
 func lerp_head_rotation():
 	var perc = time/time_to_lerp
-	camera.rotation = lerp(last_hrot, new_hrot, perc)
+	if last_hrot:
+		camera.rotation = lerp(last_hrot, new_hrot, perc)
+	else:
+		camera.rotation = new_hrot
 	var current_head_transform = initial_head_transform.rotated(Vector3(-1, 0, 0), -camera.rotation.x)
 	skel.set_bone_pose(headbone, current_head_transform)
 
@@ -219,6 +228,7 @@ func release_crouch():
 func switching_weapons(index):
 	hand_anim.play("switch_weapon")
 func reloading():
+	sound_emit("reload")
 	hand_anim.play("reload")
 func shooting():
 	sound_emit(hand.selected_weapon.shooting_sound)
@@ -239,10 +249,10 @@ func die():
 	deatheffect.global_transform.origin = $Center.global_transform.origin
 	
 	# add a ragdoll
-	var ragdoll = preloaded_ragdoll.instance()
-	ragdoll.rotation = rotation
-	ragdoll.init(global_transform.origin)
-	get_tree().root.add_child(ragdoll)
+	#var ragdoll = preloaded_ragdoll.instance()
+	#ragdoll.rotation = rotation
+	#ragdoll.init(global_transform.origin)
+	#get_tree().root.add_child(ragdoll)
 	
 	# if spectating this puppet -> tell the world to spectate another one
 	if camera.current:
