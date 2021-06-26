@@ -41,4 +41,5 @@ autostart = true
 
 [node name="Front" type="Position3D" parent="."]
 transform = Transform( 0.999999, -4.1434e-16, 0, -8.32664e-17, 0.999999, 0, -8.88178e-15, 4.61853e-14, 1, 7.64662e-09, -2.04891e-09, -0.55 )
+
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

@@ -10,7 +10,7 @@ var puppet_player = preload("res://Scenes/player/PuppetPlayer/PuppetPlayer.tscn"
 var puppet_players = {}
 var puppet_nodes_parent = null
 
-var tickrate = 64
+remote var tickrate setget tickrate_set
 
 # TODO:
 # - request_time
@@ -19,12 +19,19 @@ func _ready():
 	game_hud = get_node("GameHUD")
 	
 	puppet_nodes_parent = get_parent().get_node("PuppetPlayers")
+	
+	# tell the server the we loaded the map
+	rpc_id(1, "player_loaded", Network.local_id)
+
+func tickrate_set(value):
+	tickrate = value
 	$TickrateTimer.wait_time = 1.0/tickrate
 	$TickrateTimer.autostart = false
 	$TickrateTimer.one_shot = false
 	
-	# tell the server the we loaded the map
-	rpc_id(1, "player_loaded", Network.local_id)
+	# start the ticks and tell the server that we are ready
+	$TickrateTimer.start()
+	rpc_id(1, "player_ready", Network.local_id)
 
 # - Tell the Server ->
 func update_self():
@@ -103,10 +110,8 @@ remote func init_self(info):
 	get_parent().add_child(player)
 	get_parent().spectating(false)
 	player.init(info)
-	$TickrateTimer.start()
 	
-	# tell the server that we are ready
-	rpc_id(1, "player_ready", Network.local_id)
+	rpc_id(1, "request_tickrate", player_id)
 
 #remote func init_players(players):
 #	# spawn players (instanciate puppet players)
@@ -127,7 +132,7 @@ remote func update_puppet_player(info):
 		# create new puppet player
 		var new_p = puppet_player.instance()
 		puppet_nodes_parent.add_child(new_p)
-		new_p.init(info)
+		new_p.init(info, tickrate)
 remote func shoot_bullet_puppet(pid, dir, power):
 	get_puppet_player(pid).shoot(dir, power)
 

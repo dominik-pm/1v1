@@ -18,9 +18,9 @@ onready var sound_emitter_pos = $SoundEmitterPosition
 
 
 var data = { 
-	id = 99, 
-	position = Vector3(0,3,0), 
-	rotation = Vector3(0,0,0), 
+	id = 99,
+	position = Vector3(0,3,0),
+	rotation = Vector3(0,0,0),
 	headrotation = Vector3(0,0,0),
 	animation = "idle",
 	weapons = ["m4", "pistol"]
@@ -39,6 +39,8 @@ var can_move = true
 # <- management -
 
 # - movement ->
+export var STEPPING_SOUND_INTERVAL = 0.25
+
 export var jump_force = 10
 var jumping = false
 var crouching = false
@@ -77,9 +79,17 @@ var recoil = false
 # <- recoil -
 
 var sounds
+var sounds_multiplayer
+
+var can_play_step = true
+var step_timer
 
 func _ready():
-	pass
+	step_timer = Timer.new()
+	step_timer.wait_time = STEPPING_SOUND_INTERVAL
+	step_timer.one_shot = true
+	add_child(step_timer)
+	step_timer.connect("timeout", self, "_on_step_timer_timeout")
 
 func init(info):
 	cam.current = true
@@ -94,6 +104,9 @@ func init(info):
 		"reload": $PlayerSounds/reload.stream,
 		"weapon_switch": $PlayerSounds/weapon_switch.stream,
 		"hit_target": $PlayerSounds/hit_target.stream
+	}
+	sounds_multiplayer = {
+		"step": $EmittingSounds/step.stream
 	}
 	
 	update_settings()
@@ -160,11 +173,13 @@ func clamp_aim():
 func _process(delta):
 	get_input(delta)
 	data.position = global_transform.origin
+	data.velocity = vel
 	data.headrotation = cam.rotation
 	data.rotation = rotation
 
-#var cur_accel = ""
-#var last_accel = "s"
+# for testing
+var cur_accel = ""
+var last_accel = "s"
 func get_input(delta):
 	if can_move:
 		# shooting
@@ -187,13 +202,13 @@ func get_input(delta):
 	
 	if can_move:
 		# get the desired movement direction
-		if Input.is_action_pressed("forward"):
+		if Input.is_action_pressed("move_forward"):
 			target_dir.y += 1
-		if Input.is_action_pressed("backward"):
+		if Input.is_action_pressed("move_backward"):
 			target_dir.y -= 1
-		if Input.is_action_pressed("left"):
+		if Input.is_action_pressed("move_left"):
 			target_dir.x += 1
-		if Input.is_action_pressed("right"):
+		if Input.is_action_pressed("move_right"):
 			target_dir.x -= 1
 	
 	if not (jumping or crouching):
@@ -204,30 +219,30 @@ func get_input(delta):
 	# change acceleration/velocity according to the current state
 	var speed
 	var acceleration
-	var temp_velocity = vel
-	temp_velocity.y = 0
 	
 	if target_dir.length() > 0.1:
 		# if moving
 		if not jumping:
 			acceleration = ACCEL_RUN
-			#cur_accel = "accel run"
+			cur_accel = "accel run"
 			if not crouching:
 				stepping()
 		else:
-			#cur_accel = "accel air"
+			cur_accel = "accel air"
 			acceleration = ACCEL_AIR
 	else:
 		if not jumping:
-			#cur_accel = "deaccel run"
+			cur_accel = "deaccel run"
 			acceleration = DEACCEL_RUN
 		else:
-			#cur_accel = "deaccel air"
+			cur_accel = "deaccel air"
 			acceleration = DEACCEL_AIR
 	
-	#if cur_accel != last_accel:
+	data.accel = acceleration
+	
+	if cur_accel != last_accel:
 	#	print(cur_accel)
-	#	last_accel = cur_accel
+		last_accel = cur_accel
 	
 	if jumping:
 		# in air
@@ -239,15 +254,9 @@ func get_input(delta):
 		else:
 			speed = RUNNING_SPEED
 	
-	
 	# apply the velocity
-	#temp_velocity = temp_velocity.linear_interpolate(Vector3(target_dir.x, 0, target_dir.y)*speed, acceleration * delta)
-	#vel.x = temp_velocity.x
-	#vel.y = temp_velocity.y
-	
 	vel.x = lerp(vel.x, target_dir.x * speed, acceleration*delta)
 	vel.z = lerp(vel.z, target_dir.y * speed, acceleration*delta)
-	
 	vel.y += grav * delta
 	if vel.y < max_grav:
 		vel.y = max_grav
@@ -264,7 +273,7 @@ func get_input(delta):
 		crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,2.4,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 		crouchtween.start()
 		crouching = true
-	elif (not Input.is_action_pressed("crouch") or jumping) and crouching:
+	elif (Input.is_action_just_released("crouch") or jumping) and crouching:
 		# release crouch
 		crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 5, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 		crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,0.6,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
@@ -273,13 +282,10 @@ func get_input(delta):
 	
 	vel = move_and_slide(vel, Vector3.UP)
 	
-	if vel.length() < 0.1:
+	if vel.length() < 0.05:
 		vel = Vector3.ZERO
 	
-	# use vel for weapons spread
-	# use vel (except y for the movement velocity display) 
-	
-	if is_on_floor() and vel.y < 0:
+	if is_on_floor():
 		vel.y = 0
 		jumping = false
 	
@@ -294,8 +300,12 @@ func jump():
 	jumping = true
 
 func stepping():
-	if not $EmittingSounds/step.playing:
-		$EmittingSounds/step.play()
+	if can_play_step:
+		can_play_step = false
+		step_timer.start()
+		sound_emit("step")
+func _on_step_timer_timeout():
+	can_play_step = true
 func switching_weapons(index):
 	switching_weapons = true
 	hud.update_weapon(index)

@@ -12,12 +12,25 @@ func _ready():
 	$Smoke.emitting = true
 	yield(get_tree().create_timer(ttl), \"timeout\")
 	queue_free()
+
+func init(pos, nor):
+	# place
+	global_transform.origin = pos
+	global_transform.origin += nor.normalized()*0.01 # so there is no visual bug sticking in the object
+	# face away from the collision position
+	look_at(pos-nor, Vector3(1,1,0))
+	
+	var hole = get_node(\"MeshInstance\")
+	# rand rotation for the bullet hole
+	hole.rotation = Vector3(hole.rotation.x, hole.rotation.y, rand_range(-1, 1))
+	# rand scale for the bullet hole
+	var rand_scale = rand_range(0.8, 1.2)
+	hole.scale = Vector3(rand_scale, rand_scale, rand_scale)
 "
 
 [sub_resource type="SpatialMaterial" id=2]
 flags_transparent = true
 flags_unshaded = true
-params_billboard_mode = 1
 albedo_color = Color( 0, 0, 0, 0.658824 )
 
 [sub_resource type="QuadMesh" id=3]
@@ -25,20 +38,23 @@ material = SubResource( 2 )
 size = Vector2( 0.04, 0.04 )
 
 [sub_resource type="Gradient" id=4]
-colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 0 )
+colors = PoolColorArray( 1, 1, 1, 0.560784, 1, 1, 1, 0 )
 
 [sub_resource type="GradientTexture" id=5]
 gradient = SubResource( 4 )
 
 [sub_resource type="ParticlesMaterial" id=6]
-spread = 180.0
+spread = 60.0
 gravity = Vector3( 0, 0, 0 )
-initial_velocity = 0.2
-angular_velocity = 26.55
+initial_velocity = 0.4
+initial_velocity_random = 0.11
+angular_velocity = 60.3
 angular_velocity_random = 0.64
-damping = 0.05
+damping = 0.2
 angle = 595.9
 angle_random = 1.0
+scale = 1.5
+scale_random = 0.5
 color_ramp = SubResource( 5 )
 
 [sub_resource type="SpatialMaterial" id=7]
@@ -66,8 +82,8 @@ mesh = SubResource( 3 )
 material/0 = null
 
 [node name="Smoke" type="Particles" parent="."]
-amount = 4
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0 )
 lifetime = 2.0
-explosiveness = 0.85
+explosiveness = 1.0
 process_material = SubResource( 6 )
 draw_pass_1 = SubResource( 8 )

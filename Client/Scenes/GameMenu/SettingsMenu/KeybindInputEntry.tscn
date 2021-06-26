@@ -1,0 +1,73 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Assets/Fonts/grobold_16.tres" type="DynamicFont" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends HBoxContainer
+
+var key
+var value
+var menu
+
+onready var button = $KeyInputButton
+
+var waiting_input = false
+
+func _ready():
+	button.connect(\"pressed\", self, \"_on_KeyInputButton_pressed\")
+
+func init(k, v, m):
+	key = k
+	$Label.text = key
+	value = v
+	set_text()
+	menu = m
+
+func _input(event):
+	if waiting_input:
+		if event is InputEventKey:
+			value = event.scancode
+			menu.change_bind(key, value)
+			set_text()
+		if event is InputEventMouseButton:
+			set_text()
+
+func set_text():
+	if value != null:
+		button.text = OS.get_scancode_string(value)
+	else:
+		button.text = \"Unassigned\"
+	button.pressed = false
+	waiting_input = false
+
+func _on_KeyInputButton_pressed():
+	if not waiting_input:
+		button.text = \"Press Any Key\"
+		waiting_input = true
+"
+
+[node name="KeybindInputEntry" type="HBoxContainer"]
+margin_right = 600.0
+margin_bottom = 25.0
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_top = 3.0
+margin_right = 298.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "Move Forward"
+
+[node name="KeyInputButton" type="Button" parent="."]
+margin_left = 302.0
+margin_right = 600.0
+margin_bottom = 25.0
+focus_mode = 0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+text = "W"
+flat = true

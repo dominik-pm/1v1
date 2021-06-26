@@ -6,9 +6,9 @@ var death_explosion = preload("res://Scenes/Effects/DeathExplosion.tscn")
 var ragdoll = preload("res://Scenes/Effects/Ragdoll.tscn")
 
 func _ready():
-	init(3)
+	init("Bot1")
 
-func init(i):
+func init(n):
 	self.connect("request_camera_shake", cam, "_on_camera_shake_requested")
 	self.connect("request_camera_recoil", cam, "_on_camera_recoil_requested")
 	
@@ -16,7 +16,7 @@ func init(i):
 	#cam.translation = skel.get_bone_global_pose(headbone).origin # wrong?
 	initial_head_transform = skel.get_bone_pose(headbone)
 	
-	name = "Bot"
+	name = n
 	$NameTag.set_name(name)
 	$HealthBar.update(health)
 	
@@ -32,6 +32,9 @@ func clamp_aim():
 
 func aim(event):
 	pass
+
+func switching_weapons(index):
+	hand_anim.play("switch_weapon")
 
 func _input(event):
 	if event.is_action_pressed("ui_left"):
@@ -159,10 +162,11 @@ func die():
 	get_tree().root.add_child(rd)
 	
 	# respawn
-	respawn(Vector3(0, 3, 0))
+	respawn(Vector3(rand_range(-10, 10), 6, rand_range(-10, 10)))
 
 func respawn(pos):
 	health = max_health
+	$HealthBar.update(health)
 	hand.reset(data.weapons)
 	global_transform.origin = pos
 func switch_weapons():

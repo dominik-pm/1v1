@@ -1,7 +1,7 @@
 extends Control
 
 func _ready():
-	pass
+	hide()
 
 func _on_MenuBtn_pressed():
 	Network.disconnect_from_server()
@@ -14,10 +14,8 @@ func _on_LeaveBtn_pressed():
 func _on_Settings_pressed():
 	$SettingsMenu.show_menu()
 
-func update_player_settings():
-	get_parent().player.update_settings()
-
 func hide_menu():
+	get_parent().player.update_settings()
 	hide()
 	$SettingsMenu.hide_menu()
 

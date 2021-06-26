@@ -16,6 +16,9 @@ margin_top = 52.0
 margin_right = 640.0
 margin_bottom = 97.0
 script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Playername" type="Label" parent="."]
 margin_right = 210.0
@@ -23,11 +26,11 @@ margin_bottom = 45.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "nitrogen"
-align = 2
+clip_text = true
 
 [node name="KillCountLabel" type="Label" parent="."]
 margin_left = 214.0
-margin_right = 424.0
+margin_right = 425.0
 margin_bottom = 45.0
 size_flags_horizontal = 3
 size_flags_vertical = 7
@@ -40,7 +43,7 @@ __meta__ = {
 }
 
 [node name="DeathCountLabel" type="Label" parent="."]
-margin_left = 428.0
+margin_left = 429.0
 margin_right = 640.0
 margin_bottom = 45.0
 size_flags_horizontal = 3

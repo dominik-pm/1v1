@@ -28,32 +28,32 @@ func _input(event):
 	#	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
 	if event.is_action_pressed("overview_cam") and not in_overview:
-		# switch to overview cam
-		overview_cam.current = true
-		in_overview = true
-		var ps = get_puppets()
-		ps[spectating_index].set_spectate(false)
+		spectate_overview()
 	
+	if event.is_action_pressed("spectate_next") or event.is_action_pressed("spectate_previous"):
+		var ps = get_puppets()
+		if ps.size() > 0:
+			ps[spectating_index].set_spectate(false)
+			overview_cam.current = false
+			if event.is_action_pressed("spectate_next"):
+				if ps.size() > spectating_index + 1:
+					spectating_index = spectating_index + 1
+				else:
+					spectating_index = 0
+			elif event.is_action_pressed("spectate_previous"):
+				if spectating_index >= 1:
+					spectating_index = spectating_index - 1
+				else:
+					spectating_index = ps.size()-1
+			in_overview = false
+			ps[spectating_index].set_spectate(true)
+
+func spectate_overview():
+	overview_cam.current = true
+	in_overview = true
 	var ps = get_puppets()
 	if ps.size() > 0:
-		if event.is_action_pressed("spectate_next"):
-			overview_cam.current = false
-			ps[spectating_index].set_spectate(false)
-			if ps.size() > spectating_index + 1:
-				spectating_index = spectating_index + 1
-			else:
-				spectating_index = 0
-			in_overview = false
-			ps[spectating_index].set_spectate(true)
-		if event.is_action_pressed("spectate_previous"):
-			overview_cam.current = false
-			ps[spectating_index].set_spectate(false)
-			if spectating_index >= 1:
-				spectating_index = spectating_index - 1
-			else:
-				spectating_index = ps.size()-1
-			in_overview = false
-			ps[spectating_index].set_spectate(true)
+		ps[spectating_index].set_spectate(false)
 
 func get_puppets():
 	var ps = []

@@ -1,15 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Scenes/player/Overhead/HealthBar2D.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Assets/Player/HealthBar.png" type="Texture" id=2]
 
-[sub_resource type="SpatialMaterial" id=1]
-flags_transparent = true
-flags_unshaded = true
-vertex_color_use_as_albedo = true
-params_billboard_mode = 1
-
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Sprite3D
 
 func _ready():
@@ -20,9 +14,9 @@ func update(value):
 "
 
 [node name="HealthBar" type="Sprite3D"]
-material_override = SubResource( 1 )
+billboard = 1
 texture = ExtResource( 2 )
-script = SubResource( 2 )
+script = SubResource( 1 )
 
 [node name="Viewport" type="Viewport" parent="."]
 size = Vector2( 200, 26 )

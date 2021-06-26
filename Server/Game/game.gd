@@ -26,9 +26,9 @@ var player_weapons = {}
 var players_loaded = 0
 var players_ready = 0
 var empty_player_info = { 
-	id = 99, 
-	position = Vector3(0,3,0), 
-	rotation = Vector3(0,0,0), 
+	id = 99,
+	position = Vector3(0,3,0),
+	rotation = Vector3(0,0,0),
 	headrotation = Vector3(0,0,0),
 	animation = "idle",
 	weapons = ["m4", "pistol"]
@@ -67,7 +67,10 @@ remote func player_loaded(pid):
 		gm.init_player(pid)
 	else:
 		new_client_ready(pid)
-		
+
+remote func request_tickrate(pid):
+	rset_id(pid, "tickrate", tickrate)
+
 # when everyone initialized themself, we can tell the gamemode to start
 remote func player_ready(pid):
 	players_ready += 1
@@ -289,7 +292,7 @@ func update_puppet_players():
 			# create new puppet player, because it doesnt exist yet
 			var new_p = puppet_player.instance()
 			players_nodes_parent.add_child(new_p)
-			new_p.init(players[pid])
+			new_p.init(players[pid], tickrate)
 			new_p.update(players[pid])
 func remove_player_puppet(pid):
 	get_puppet_player(pid).queue_free()

@@ -1,6 +1,6 @@
 extends Gamemode
 
-const ROUND_TIME = 30 # (seconds)
+const ROUND_TIME = 100 # (seconds)
 var timer
 var leader_pid = null
 

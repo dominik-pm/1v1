@@ -55,11 +55,10 @@ margin_right = 210.0
 margin_bottom = 33.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 5 )
-text = "Playernames:"
 
 [node name="KillIcon" type="TextureRect" parent="TextureRect/VBoxContainer/Header"]
 margin_left = 214.0
-margin_right = 424.0
+margin_right = 425.0
 margin_bottom = 48.0
 rect_min_size = Vector2( 48, 32 )
 size_flags_horizontal = 3
@@ -68,7 +67,7 @@ expand = true
 stretch_mode = 6
 
 [node name="DeathIcon" type="TextureRect" parent="TextureRect/VBoxContainer/Header"]
-margin_left = 428.0
+margin_left = 429.0
 margin_right = 640.0
 margin_bottom = 48.0
 rect_min_size = Vector2( 48, 48 )

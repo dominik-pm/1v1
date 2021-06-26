@@ -45,5 +45,6 @@ __meta__ = {
 [node name="GameMenu" parent="." instance=ExtResource( 3 )]
 
 [node name="ServerHUD" parent="." instance=ExtResource( 4 )]
+
 [connection signal="timeout" from="TickrateTimer" to="." method="_on_TickrateTimer_timeout"]
 [connection signal="visibility_changed" from="GameMenu" to="GameMenu" method="_on_GameMenu_visibility_changed"]

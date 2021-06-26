@@ -517,28 +517,40 @@ surfaces/0 = {
 
 [sub_resource type="Skin" id=15]
 bind_count = 12
+bind/0/name = ""
 bind/0/bone = 0
 bind/0/pose = Transform( 1, 0, -2.38419e-07, 2.38419e-07, 0, 1, 2.84217e-14, -1, 1.19209e-07, 0, 0, -4.76837e-07 )
+bind/1/name = ""
 bind/1/bone = 1
 bind/1/pose = Transform( 1, 0, 0, 2.84217e-14, 0, 1, 2.84217e-14, -1, 1.19209e-07, 0, 0, 0.437099 )
+bind/2/name = ""
 bind/2/bone = 2
 bind/2/pose = Transform( -0.735193, -0.677859, -1.66665e-07, -5.84652e-08, -3.01668e-07, 1, -0.677859, 0.735192, 9.45106e-08, 0.5539, -7.09746e-07, 0.766617 )
+bind/3/name = ""
 bind/3/bone = 3
 bind/3/pose = Transform( 1.45556e-06, 3.13792e-08, 1, 0.994913, 0.100751, -1.46723e-06, -0.10075, 0.994912, 1.99908e-08, -3.30972e-06, -1.87068, 1.56939 )
+bind/4/name = ""
 bind/4/bone = 4
 bind/4/pose = Transform( -0.735193, 0.677859, 1.66665e-07, 5.84652e-08, -3.01668e-07, 1, 0.677859, 0.735192, 9.45107e-08, -0.5539, -7.09746e-07, 0.766617 )
+bind/5/name = ""
 bind/5/bone = 5
 bind/5/pose = Transform( 1.45556e-06, -3.13791e-08, -1, -0.994913, 0.100751, -1.46723e-06, 0.10075, 0.994912, 1.99908e-08, 3.30972e-06, -1.87068, 1.56939 )
+bind/6/name = ""
 bind/6/bone = 6
 bind/6/pose = Transform( 1, 0, -8.74227e-08, -8.74228e-08, 0, -1, -2.84217e-14, 1, -1.19209e-07, 0, 0, 4.76837e-07 )
+bind/7/name = ""
 bind/7/bone = 7
 bind/7/pose = Transform( 1, 0, 2.38419e-07, 2.38419e-07, 0, -1, -2.84217e-14, 1, -1.19209e-07, 0, 0, 2.37861 )
+bind/8/name = ""
 bind/8/bone = 8
 bind/8/pose = Transform( -1, -8.96947e-14, 1.50996e-07, 1.50996e-07, -2.30332e-07, 1, -8.33372e-14, 1, 1.11123e-07, 0.593093, -1.10032e-06, 2.89982 )
+bind/9/name = ""
 bind/9/bone = 9
 bind/9/pose = Transform( 1, -4.30577e-22, 2.84217e-14, -4.26326e-14, 1.34359e-07, -1, -2.84217e-14, 1, 1.51495e-08, -0.593093, 5.98099e-07, 4.29978 )
+bind/10/name = ""
 bind/10/bone = 10
 bind/10/pose = Transform( -1, -3.47792e-14, -8.74228e-08, -8.74227e-08, -2.30332e-07, 1, -8.33372e-14, 1, 1.11123e-07, -0.593093, -1.06261e-06, 2.89982 )
+bind/11/name = ""
 bind/11/bone = 11
 bind/11/pose = Transform( 1, 8.5416e-15, -6.35731e-08, -6.35731e-08, 1.34359e-07, -1, -2.84217e-14, 1, 1.51495e-08, 0.593093, 5.60394e-07, 4.29978 )
 
@@ -639,7 +651,7 @@ stream = ExtResource( 13 )
 transform = Transform( 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0 )
 stream = ExtResource( 16 )
 
-[node name="step" type="AudioStreamPlayer" parent="EmittingSounds"]
+[node name="step" type="AudioStreamPlayer3D" parent="EmittingSounds"]
 stream = ExtResource( 15 )
 
 [node name="jump" type="AudioStreamPlayer3D" parent="EmittingSounds"]
@@ -730,43 +742,43 @@ skin = SubResource( 15 )
 material/0 = ExtResource( 1 )
 
 [node name="Head" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( 1, -4.81485e-35, 1.69407e-21, 2.84217e-14, 1.19209e-07, -1, -2.40741e-35, 1, 1.42109e-14, -1.48095e-21, 0.4371, -6.21156e-15 )
+transform = Transform( 1, 0, 0, 2.84217e-14, 1.19209e-07, -1, 0, 1, 0, 0, 0.4371, 0 )
 bone_name = "Head"
 
 [node name="Torso" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( 1, -8.45811e-08, -2.21092e-08, 1.80562e-14, -0.252899, 0.967493, -8.7423e-08, -0.967493, -0.252899, 0, 0, 0 )
+transform = Transform( 1, -8.7423e-08, 0, 1.80001e-14, -1.19209e-07, 1, -8.7423e-08, -1, 0, 0, -4.76837e-07, 0 )
 bone_name = "Torso"
 
 [node name="Arm1l" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -0.96608, 0.245561, -0.0799254, -0.241551, -0.749822, 0.615971, 0.0913286, 0.614384, 0.783704, 0.926881, -0.188145, 7.07179e-07 )
+transform = Transform( -0.735191, -5.84656e-08, -0.677859, -0.677859, -1.82459e-07, 0.735192, -2.47471e-07, 1, 1.82153e-07, 0.926881, -0.188145, 7.07179e-07 )
 bone_name = "Arm1.l"
 
 [node name="Arm2l" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -0.644563, 0.759042, 0.0916131, -0.432003, -0.262718, -0.862759, -0.630802, -0.59568, 0.497247, 1.05568, -1.18081, -1.26297 )
+transform = Transform( 1.46177e-06, 0.994911, -0.100751, 1.27933e-07, 0.100751, 0.994912, 1, -1.45131e-06, 1.15429e-07, 2.01928, -1.37294, 4.13633e-07 )
 bone_name = "Arm2.l"
 
 [node name="Arm1r" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -0.931446, -0.0808738, -0.354776, -0.0565564, -0.930964, 0.360704, -0.359456, 0.356041, 0.86257, -0.926881, -0.188145, 7.07179e-07 )
+transform = Transform( -0.735191, 5.84655e-08, 0.677859, 0.677859, -1.82459e-07, 0.735192, 2.47471e-07, 1, 1.82153e-07, -0.926881, -0.188145, 7.07179e-07 )
 bone_name = "Arm1.r"
 
 [node name="Arm2r" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -0.745874, 0.171025, -0.643755, 0.118238, -0.91713, -0.380648, -0.655508, -0.360032, 0.663842, -0.355145, -0.769433, -1.39006 )
+transform = Transform( 1.46177e-06, -0.994911, 0.100751, -1.27933e-07, 0.100751, 0.994912, -1, -1.45131e-06, 1.15429e-07, -2.01928, -1.37294, 4.13632e-07 )
 bone_name = "Arm2.r"
 
 [node name="Leg1l" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -0.999964, 0.00766692, 0.00360976, 0.0059424, 0.330722, 0.943709, 0.00604151, 0.943697, -0.330756, 0.593093, -2.80556, 0.733364 )
+transform = Transform( -1, 1.50996e-07, -5.49153e-14, -1.00116e-13, -1.11123e-07, 1, 1.50996e-07, 1, 2.30332e-07, 0.593093, -2.89983, 3.4284e-07 )
 bone_name = "Leg1.l"
 
 [node name="Leg2l" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( 0.998804, -0.0474416, 0.0117922, -0.0404227, -0.665859, 0.744982, -0.0274912, -0.744568, -0.66698, 0.58804, -4.12672, 1.19641 )
+transform = Transform( 1, 5.27041e-21, 1.96512e-19, 2.84217e-14, 1.51496e-08, 1, -1.26488e-20, -1, 1.34359e-07, 0.593093, -4.29979, 2.03844e-08 )
 bone_name = "Leg2.l"
 
 [node name="Leg1r" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -0.9995, -0.0316246, -0.000153131, 0.0145656, -0.464635, 0.885382, -0.028071, 0.884937, 0.464864, -0.593093, -2.80556, 0.733364 )
+transform = Transform( -1, -8.7422e-08, -5.49153e-14, -7.36224e-14, -1.11123e-07, 1, -8.7422e-08, 1, 2.30332e-07, -0.593093, -2.89983, 3.42841e-07 )
 bone_name = "Leg1.r"
 
 [node name="Leg2r" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( 0.999679, 0.0250596, -0.00368339, -0.00298388, 0.260926, 0.965354, 0.0251525, -0.965033, 0.260917, -0.592879, -4.04506, 0.082574 )
+transform = Transform( 1, -6.3574e-08, 8.47033e-20, 2.93847e-14, 1.51496e-08, 1, -6.3574e-08, -1, 1.34359e-07, -0.593093, -4.29979, 2.03855e-08 )
 bone_name = "Leg2.r"
 [connection signal="timeout" from="Camera/TimerShake" to="Camera" method="_on_TimerShake_timeout"]
 [connection signal="animation_finished" from="HandAnimation" to="." method="_on_HandAnimation_animation_finished"]

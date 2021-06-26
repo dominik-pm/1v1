@@ -36,10 +36,23 @@ export var ACCEL_AIR = 20
 export var DEACCEL_AIR = 0.1
 export var crouching_speed = 3
 var vel = Vector3()
+var acc = 0
 
 var grav = -30
 var max_grav = -60
 # <- movement -
+
+# - network lerping ->
+var lerp_active = false
+var time = 0
+var time_to_lerp
+var new_pos
+var new_rot
+var new_hrot
+var last_pos
+var last_rot
+var last_hrot
+# <- network lerping -
 
 # - PvP ->
 var max_health = 100
@@ -51,7 +64,9 @@ var sounds
 func _ready():
 	pass
 
-func init(info):
+func init(info, tickrate):
+	time_to_lerp = 1.0 / tickrate
+	
 	camera = get_node("Camera")
 	headbone = skel.find_bone("Head")
 	initial_head_transform = skel.get_bone_pose(headbone)
@@ -72,9 +87,16 @@ func set_spectate(is_spectating):
 
 var last_anim = ""
 func update(info):
-	# position / rotation
-	global_transform.origin = info.position
-	rotation = info.rotation
+	time = 0
+	
+	# movement/rotation
+	last_pos = new_pos
+	new_pos = info.position
+	last_rot = new_rot
+	new_rot = info.rotation
+	last_hrot = new_hrot
+	new_hrot = info.headrotation
+	lerp_active = true
 	
 	# animation
 	if last_anim != info.animation and not crouching:
@@ -86,6 +108,26 @@ func update(info):
 	var current_head_transform = initial_head_transform.rotated(Vector3(-1, 0, 0), -camera.rotation.x)
 	skel.set_bone_pose(headbone, current_head_transform)
 
+func _physics_process(delta):
+	if lerp_active:
+		time += delta
+		if new_pos != last_pos:
+			lerp_movement()
+		if new_rot != last_rot:
+			lerp_rotation()
+		if new_hrot != last_hrot:
+			lerp_head_rotation()
+func lerp_movement():
+	var perc = time/time_to_lerp
+	global_transform.origin = lerp(last_pos, new_pos, perc)
+func lerp_rotation():
+	var perc = time/time_to_lerp
+	rotation = lerp(last_rot, new_rot, perc)
+func lerp_head_rotation():
+	var perc = time/time_to_lerp
+	camera.rotation = lerp(last_hrot, new_hrot, perc)
+	var current_head_transform = initial_head_transform.rotated(Vector3(-1, 0, 0), -camera.rotation.x)
+	skel.set_bone_pose(headbone, current_head_transform)
 
 func shoot(dir, power):
 	var b = preload_bullet.instance()
@@ -201,6 +243,10 @@ func die():
 	ragdoll.rotation = rotation
 	ragdoll.init(global_transform.origin)
 	get_tree().root.add_child(ragdoll)
+	
+	# if spectating this puppet -> tell the world to spectate another one
+	if camera.current:
+		get_parent().get_parent().try_spectate_anyone()
 	
 	queue_free()
 

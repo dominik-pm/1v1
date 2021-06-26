@@ -26,23 +26,25 @@ func _physics_process(delta):
 			if collision.collider.player is Bot:
 				collision.collider.get_damage(20)
 		else:
-			hit_world(collision.position)
+			hit_world(collision.position, collision.normal)
 
 func hit_player():
 	create_target_hit_effects()
 	remove_self()
 
-func hit_world(pos):
-	create_bullet_hole(pos)
+func hit_world(pos, nor):
+	create_bullet_hole(pos, nor)
 	remove_self()
 
 func create_target_hit_effects():
 	$Sparks.emitting = true
 
-func create_bullet_hole(pos):
+func create_bullet_hole(pos, nor):
+	# place the new bullet hole
 	var hole = bullet_hole.instance()
 	get_tree().root.add_child(hole)
-	hole.global_transform.origin = pos - dir.normalized()*0.1
+	hole.init(pos, nor)
+
 
 func remove_self():
 	# hide the bullet and free it after 1 second

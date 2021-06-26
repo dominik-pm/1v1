@@ -125,6 +125,7 @@ nitrogen64 (3124561) connected!
 Game started!"
 
 [node name="SettingsMenu" parent="." instance=ExtResource( 3 )]
+
 [connection signal="pressed" from="CenterContainer/VBoxContainer/CreateServer" to="." method="_on_CreateServer_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/StartGame" to="." method="_on_StartGame_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/CloseServer" to="." method="_on_CloseServer_pressed"]

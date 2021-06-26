@@ -19,7 +19,6 @@ onready var vel_timer = $VelocityLabel/VelCheckingInterval
 var menu_open = false
 
 func _ready():
-	game_menu.hide_menu()
 	unscope()
 	show_fps(settings.get_setting("general", "show_fps"))
 	show_velocity(settings.get_setting("general", "show_vel"))

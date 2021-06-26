@@ -5,6 +5,7 @@
 
 [node name="Pistol" instance=ExtResource( 1 )]
 shooting_sound = "pistol"
+recoil_reset_time = 1.2
 
 [node name="PistolModel" parent="." index="0" instance=ExtResource( 2 )]
 

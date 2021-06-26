@@ -36,10 +36,22 @@ export var ACCEL_AIR = 20
 export var DEACCEL_AIR = 0.1
 export var crouching_speed = 3
 var vel = Vector3()
+var acc = 0
 
 var grav = -30
 var max_grav = -60
 # <- movement -
+
+# - network lerping ->
+var time = 0
+var time_to_lerp
+var new_pos
+var new_rot
+var new_hrot
+var last_pos
+var last_rot
+var last_hrot
+# <- network lerping -
 
 # - PvP ->
 var kills = 0
@@ -48,12 +60,13 @@ var health = max_health
 # <- PvP -
 
 var sounds
-var data
 
 func _ready():
 	pass
 
-func init(info):
+func init(info, tickrate):
+	time_to_lerp = 1.0 / tickrate
+	
 	camera = get_node("Camera")
 	headbone = skel.find_bone("Head")
 	initial_head_transform = skel.get_bone_pose(headbone)
@@ -76,44 +89,41 @@ func set_spectate(is_spectating):
 	$Armature/Skeleton/Character.visible = !is_spectating
 
 var last_anim = ""
-var interpolation_rate = 1.0
 func update(info):
-	data = info.duplicate()
+	time = 0
 	
-	# position / rotation
-	prev_position = global_transform.origin
-	global_transform.origin = info.position #global_transform.origin.linear_interpolate(info.position, delta*interpolation_rate)
-	rotation = info.rotation#rotation.linear_interpolate(info.rotation, delta*interpolation_rate)
+	# movement/rotation
+	last_pos = new_pos
+	new_pos = info.position
+	last_rot = new_rot
+	new_rot = info.rotation
+	last_hrot = new_hrot
+	new_hrot = info.headrotation
 	
 	# animation
-	if last_anim != info.animation and not crouching:
+	if last_anim != info.animation:# and not crouching:
 		anim.play(info.animation)
 		last_anim = info.animation
-	
-	# headrotation
-	camera.rotation = info.headrotation
+
+func _physics_process(delta):
+	time += delta
+	if new_pos != last_pos:
+		lerp_movement()
+	if new_rot != last_rot:
+		lerp_rotation()
+	if new_hrot != last_hrot:
+		lerp_head_rotation()
+func lerp_movement():
+	var perc = time/time_to_lerp
+	global_transform.origin = lerp(last_pos, new_pos, perc)
+func lerp_rotation():
+	var perc = time/time_to_lerp
+	rotation = lerp(last_rot, new_rot, perc)
+func lerp_head_rotation():
+	var perc = time/time_to_lerp
+	camera.rotation = lerp(last_hrot, new_hrot, perc)
 	var current_head_transform = initial_head_transform.rotated(Vector3(-1, 0, 0), -camera.rotation.x)
 	skel.set_bone_pose(headbone, current_head_transform)
-
-var prev_position
-
-func _process(delta):
-	pass
-	# lets say fr = 6, tr = 2
-	# then the player could 
-	# update its position fr/tr (6/2=3) times 
-	# for the distance of (new_loc-cur_loc)/3
-	
-	# basically xd
-	
-	#var t = (1.0/delta)/64.0
-	#var d = (data.position-prev_position)/t
-	
-	#global_transform.origin += d
-	
-	# nononoono
-	#global_transform.origin = lerp(global_transform.origin, data.position, delta*2)
-	#rotation = rotation.linear_interpolate(data.rotation, delta*interpolation_rate)
 
 func switch_weapon(index):
 	hand.switch_weapon(index)
@@ -195,17 +205,17 @@ func jump():
 	anim.play("idle", BLEND_TIME)
 	anim.play("jump", BLEND_TIME)
 	jumping = true
-func crouch():
-	anim.play("crouch", BLEND_TIME)
-	crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 3.3, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-	crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,2.4,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-	crouchtween.start()
-	crouching = true
-func release_crouch():
-	crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 5, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-	crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,0.6,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-	crouchtween.start()
-	crouching = false
+#func crouch():
+#	anim.play("crouch", BLEND_TIME)
+#	#crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 3.3, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+#	#crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,2.4,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+#	#crouchtween.start()
+#	crouching = true
+#func release_crouch():
+#	crouchtween.interpolate_property(raycol.shape, "length", raycol.shape.length, 5, 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+#	crouchtween.interpolate_property(footcast, "translation", footcast.translation, Vector3(0,0.6,0), 0.08, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+#	crouchtween.start()
+#	crouching = false
 
 # was nu ned
 func switching_weapons(index):
@@ -232,6 +242,10 @@ func die():
 	ragdoll.rotation = rotation
 	ragdoll.init(global_transform.origin)
 	get_tree().root.add_child(ragdoll)
+	
+	# if spectating this puppet -> tell the world to spectate another one
+	if camera.current:
+		get_parent().get_parent().spectate_overview()
 	
 	queue_free()
 
