@@ -4,8 +4,8 @@
 [ext_resource path="res://Scenes/Weapons/Knife/Knife_Sharp.dae" type="PackedScene" id=2]
 
 [sub_resource type="GDScript" id=1]
-script/source = "extends KinematicBody
-#extends Area
+script/source = "#extends KinematicBody
+extends Area
 
 export(NodePath) var knife_path
 var knife = null
@@ -26,7 +26,7 @@ points = PoolVector3Array( -0.0046445, -0.006069, -0.00588843, -0.0046445, -0.00
 [sub_resource type="ConvexPolygonShape" id=5]
 points = PoolVector3Array( -0.000912737, -0.0048, -0.00427253, -0.000912737, -0.0048, 0.00346067, -0.000887434, 0.0213832, 0.00335946, -0.000887434, 0.0225387, 0.00220299, -0.000887434, 0.0277445, -0.00415445, -0.000887434, 0.0277445, -0.00357621, -0.000309311, -0.00433194, 0.0039377, -0.000309311, 0.0213832, 0.0039377, -0.000309311, 0.0257162, -0.000685822, -0.000309311, 0.0277445, -0.00299798, 0.000268304, -0.00433194, 0.0039377, 0.000268304, 0.0213832, 0.0039377, 0.000268304, 0.0228275, 0.0024921, 0.000268304, 0.026005, -0.000974148, 0.000268304, 0.0277445, -0.00299798, 0.000846597, -0.00433194, -0.00415445, 0.000846597, 0.0213832, 0.00335946, 0.000846597, 0.0228275, 0.00191466, 0.000846597, 0.0277445, -0.00415445, 0.000846597, 0.0277445, -0.00357621, 0.0008719, -0.0048, 0.00346067 )
 
-[sub_resource type="Animation" id=8]
+[sub_resource type="Animation" id=6]
 resource_name = "alternate_swing"
 length = 0.6
 step = 0.01
@@ -83,10 +83,10 @@ max_spraying_spread = 0.0
 [node name="Spatial" type="Spatial" parent="."]
 transform = Transform( -1.2275, 6.05244, -7.86518, 6.46919, 6.49798, 3.99071, 7.52614, -4.59827, -4.71307, 0.171809, 0.0750536, -0.1 )
 
-[node name="Blade" type="KinematicBody" parent="Spatial" groups=[
+[node name="Blade" type="Area" parent="Spatial" groups=[
 "knife",
 ]]
-transform = Transform( 0.695695, -0.0301319, -0.717707, 0.496579, 0.742117, 0.450192, 0.519057, -0.669594, 0.53125, 0, 0, 0 )
+transform = Transform( 0.695695, -0.030132, -0.717707, 0.496579, 0.742117, 0.450193, 0.519057, -0.669594, 0.53125, 0, 0, 0 )
 collision_layer = 4
 collision_mask = 8
 script = SubResource( 1 )
@@ -109,10 +109,12 @@ shape = SubResource( 4 )
 shape = SubResource( 5 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/alternate_swing = SubResource( 8 )
+anims/alternate_swing = SubResource( 6 )
 anims/swing = SubResource( 7 )
 
 [node name="RecoilResetTimer" type="Timer" parent="."]
 one_shot = true
+
+[connection signal="body_entered" from="Spatial/Blade" to="." method="_on_Blade_body_entered"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
 [connection signal="timeout" from="RecoilResetTimer" to="." method="_on_RecoilResetTimer_timeout"]

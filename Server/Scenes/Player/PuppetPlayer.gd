@@ -144,10 +144,6 @@ func shoot(dir, power, dmg, p_shot_id):
 	get_tree().root.add_child(b)
 	
 	shooting()
-func knifing(is_alternate):
-	if hand.selected_weapon != null:
-		if hand.selected_weapon.item["slot"] == "KNIFE":
-			hand.selected_weapon.knife(int(name), is_alternate)
 func get_input(delta):
 	"""
 	# movement
@@ -228,14 +224,18 @@ func jump():
 #	crouchtween.start()
 #	crouching = false
 
-# was nu ned
-func reloading():
-	sound_emit("reload")
-	hand_anim.play("reload")
+# game called -> server called
 func switching_weapons(index):
 	hand_anim.play("switch_weapon")
+func reloading():
+	#sound_emit("reload")
+	hand_anim.play("reload")
 func shooting():
 	hand_anim.play("shoot")
+func knifing(is_alternate):
+	if hand.selected_weapon != null:
+		if hand.selected_weapon.item["slot"] == "KNIFE":
+			hand.selected_weapon.knife(int(name), is_alternate)
 #
 
 func get_damage(amt):

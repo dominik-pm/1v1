@@ -144,68 +144,6 @@ func shoot(dir, power):
 	b.init(transf, dir, power)
 	get_tree().root.add_child(b)
 
-func get_input(delta):
-	"""
-	# movement
-	var target_dir = Vector2(0, 0)
-	
-	if not (jumping or crouching):
-		set_anim(target_dir)
-	
-	target_dir = -target_dir.normalized().rotated(-rotation.y)
-	
-	# change acceleration/velocity according to the current state
-	var speed
-	var acceleration
-	var temp_velocity = vel
-	temp_velocity.y = 0
-	
-	if temp_velocity.length() > 1:
-		# if moving
-		if not jumping:
-			acceleration = ACCEL_RUN
-			if not is_sound_playing("step"):
-				sound_emit("step")
-		else:
-			acceleration = ACCEL_AIR
-	else:
-		if not jumping:
-			acceleration = DEACCEL_RUN
-		else:
-			acceleration = DEACCEL_AIR
-	
-	if jumping:
-		# in air
-		speed = running_speed
-	else:
-		# on floor
-		if crouching:
-			speed = crouching_speed
-		else:
-			speed = running_speed
-	
-	
-	# apply the velocity
-	#temp_velocity = temp_velocity.linear_interpolate(Vector3(target_dir.x, 0, target_dir.y)*speed, acceleration * delta)
-	#vel.x = temp_velocity.x
-	#vel.y = temp_velocity.y
-	
-	vel.x = lerp(vel.x, target_dir.x * speed, acceleration*delta)
-	vel.z = lerp(vel.z, target_dir.y * speed, acceleration*delta)
-	
-	vel.y += grav * delta
-	if vel.y < max_grav:
-		vel.y = max_grav
-	
-	move_and_slide(vel, Vector3(0, 1, 0))
-	
-	if is_on_floor() and vel.y < 0:
-		vel.y = 0
-		jumping = false
-	
-	var current_head_transform = initial_head_transform.rotated(Vector3(-1, 0, 0), -cam.rotation.x)
-	skel.set_bone_pose(headbone, current_head_transform)
-	"""
 
 func jump():
 	vel.y = jump_force
@@ -224,19 +162,21 @@ func release_crouch():
 	crouchtween.start()
 	crouching = false
 
-# was nu ned
+# game called -> server called
 func switching_weapons(index):
 	hand_anim.play("switch_weapon")
 func reloading():
-	sound_emit("reload")
+	#sound_emit("reload")
 	hand_anim.play("reload")
 func shooting():
-	sound_emit(hand.selected_weapon.shooting_sound)
+	#sound_emit(hand.selected_weapon.shooting_sound)
 	hand_anim.play("shoot")
 func knifing(is_alternate):
 	if hand.selected_weapon != null:
 		if hand.selected_weapon.item["slot"] == "KNIFE":
 			hand.selected_weapon.knife(is_alternate)
+#
+
 func get_damage(amt, player_fired, bodypart):
 	# update health
 	health -= amt
@@ -250,9 +190,9 @@ func die():
 	
 	# add a ragdoll
 	#var ragdoll = preloaded_ragdoll.instance()
+	#get_tree().root.add_child(ragdoll)
 	#ragdoll.rotation = rotation
 	#ragdoll.init(global_transform.origin)
-	#get_tree().root.add_child(ragdoll)
 	
 	# if spectating this puppet -> tell the world to spectate another one
 	if camera.current:

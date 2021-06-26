@@ -86,6 +86,7 @@ func is_selected_weapon_scopeable():
 func get_selected_weapon_scopefov():
 	return selected_weapon.scope_fov
 
+# player function
 func select_weapon(index):
 	# check if there is a weapon at the slot
 	var slot = get_children()[index]
@@ -95,13 +96,8 @@ func select_weapon(index):
 			player.switching_weapons(index)
 			
 			# select the new weapon after half of the drawing time
-			yield(get_tree().create_timer(0.25), "timeout")
-			
-			hide_all_items()
-			player.unscope()
-			selected_weapon = slot.get_children()[0]
-			selected_weapon.visible = true
-			update_ammo_on_hud()
+			drawing_timer.start()
+			#yield(get_tree().create_timer(0.25), "timeout")
 	else:
 		print("no weapon available at slot " + str(index))
 
@@ -120,6 +116,7 @@ func update_weapon(index):
 
 func _on_drawing_timer_timeout():
 	if is_instance_valid(self):
+		# show new item
 		hide_all_items()
 		selected_weapon = get_child(to_update_weapon_index).get_child(0)
 		selected_weapon.visible = true
@@ -217,6 +214,8 @@ func hide_all_items():
 		if slot.get_child_count() > 0:
 			var weapon = slot.get_children()[0]
 			weapon.visible = false
+			print('hiding:')
+			print(weapon)
 
 #func hide_all_items():
 #	if !global.is_offline:

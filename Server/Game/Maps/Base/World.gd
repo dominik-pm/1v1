@@ -62,4 +62,4 @@ func get_puppets():
 	return ps
 
 func player_crossed_deatharea(pid):
-	game.player_died(int(pid), int(pid), true)
+	game.player_died(int(pid), int(pid))

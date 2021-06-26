@@ -3,6 +3,7 @@ extends Spatial
 export (NodePath) var player_path
 
 const WEAPON_SLOTS = 3
+const DRAWING_TIME = 0.5
 
 var selected_weapon = null
 var can_fire = true
@@ -12,8 +13,15 @@ var play_anim = false
 var player
 var hud
 
+var drawing_timer = null
+
 func _ready():
-	pass
+	# init drawing timer
+	drawing_timer = Timer.new()
+	drawing_timer.wait_time = DRAWING_TIME / 2
+	drawing_timer.one_shot = true
+	add_child(drawing_timer)
+	drawing_timer.connect("timeout", self, "_on_drawing_timer_timeout")
 
 func init(weapons):
 	player = get_node(player_path)
@@ -64,24 +72,26 @@ func is_selected_weapon_scopeable():
 func get_selected_weapon_scopefov():
 	return selected_weapon.scope_fov
 
-func select_weapon(index):
-	# check if there is a weapon at the slot
-	var slot = get_children()[index]
-	if slot.get_child_count() == 1:
-		if get_current_weapon_index() != index:
-			# tell the player (animations and sound)
-			player.switching_weapons(index)
-			
-			# select the new weapon after half of the drawing time
-			yield(get_tree().create_timer(0.25), "timeout")
-			
-			hide_all_items()
-			player.unscope()
-			selected_weapon = slot.get_children()[0]
-			selected_weapon.visible = true
-			update_ammo_on_hud()
-	else:
-		print("no weapon available at slot " + str(index))
+# player func (delete?)
+#func select_weapon(index):
+#	# check if there is a weapon at the slot
+#	var slot = get_children()[index]
+#	if slot.get_child_count() == 1:
+#		if get_current_weapon_index() != index:
+#			# tell the player (animations and sound)
+#			player.switching_weapons(index)
+#
+#			# select the new weapon after half of the drawing time
+#			yield(get_tree().create_timer(0.25), "timeout")
+#
+#			hide_all_items()
+#			player.unscope()
+#			selected_weapon = slot.get_children()[0]
+#			selected_weapon.visible = true
+#			update_ammo_on_hud()
+#	else:
+#		print("no weapon available at slot " + str(index))
+var to_update_weapon_index = 0
 func update_weapon(index):
 	# tell the player (animations and sound)
 	player.switching_weapons(index)
@@ -89,50 +99,55 @@ func update_weapon(index):
 	if get_child(index).get_child_count() > 0:
 		selected_weapon = get_child(index).get_child(0)
 		
-	# select the new weapon after half of the drawing time
-	yield(get_tree().create_timer(0.25), "timeout")
-	
-	hide_all_items()
-	selected_weapon = get_child(index).get_child(0)
-	selected_weapon.visible = true
+	# select the new weapon after half of the drawing time#
+	#yield(get_tree().create_timer(0.25), "timeout")
+	to_update_weapon_index = index
+	drawing_timer.start()
+func _on_drawing_timer_timeout():
+	if is_instance_valid(self):
+		# show new item
+		hide_all_items()
+		selected_weapon = get_child(to_update_weapon_index).get_child(0)
+		selected_weapon.visible = true
 
-func select_slot(slot):
-	var slots = get_children()
-	for i in range(0, slots.size()):
-		if slots[i].get_child_count() > 0:
-			var weapon = slots[i].get_children()[0]
-			var cur_slot = weapon.item["slot"]
-			if cur_slot == slot:
-				select_weapon(i)
-				return
-func next_weapon():
-	# only if a weapon is already selected
-	if selected_weapon != null:
-		var index = 0
-		var weapon_count = get_weapon_count()
-		if weapon_count > 0:
-			var curr_index = get_current_weapon_index()
-			
-			if curr_index == weapon_count-1: # check if on last index
-				index = 0
-			else:
-				index = curr_index + 1
-			
-			select_weapon(index)
-func previous_weapon():
-	# only if a weapon is already selected
-	if selected_weapon != null:
-		var index = 0
-		var weapon_count = get_weapon_count()
-		if weapon_count > 0:
-			var curr_index = get_current_weapon_index()
-			
-			if curr_index == 0: # check if on first slot
-				index = weapon_count-1
-			else:
-				index = curr_index - 1
-			
-			select_weapon(index)
+# player funcs (delete?)
+#func select_slot(slot):
+#	var slots = get_children()
+#	for i in range(0, slots.size()):
+#		if slots[i].get_child_count() > 0:
+#			var weapon = slots[i].get_children()[0]
+#			var cur_slot = weapon.item["slot"]
+#			if cur_slot == slot:
+#				select_weapon(i)
+#				return
+#func next_weapon():
+#	# only if a weapon is already selected
+#	if selected_weapon != null:
+#		var index = 0
+#		var weapon_count = get_weapon_count()
+#		if weapon_count > 0:
+#			var curr_index = get_current_weapon_index()
+#
+#			if curr_index == weapon_count-1: # check if on last index
+#				index = 0
+#			else:
+#				index = curr_index + 1
+#
+#			select_weapon(index)
+#func previous_weapon():
+#	# only if a weapon is already selected
+#	if selected_weapon != null:
+#		var index = 0
+#		var weapon_count = get_weapon_count()
+#		if weapon_count > 0:
+#			var curr_index = get_current_weapon_index()
+#
+#			if curr_index == 0: # check if on first slot
+#				index = weapon_count-1
+#			else:
+#				index = curr_index - 1
+#
+#			select_weapon(index)
 
 func get_current_weapon_index():
 	var index = null
@@ -164,6 +179,8 @@ func hide_all_items():
 		if slot.get_child_count() > 0:
 			var weapon = slot.get_children()[0]
 			weapon.visible = false
+			print('hiding:')
+			print(weapon)
 
 # shooting/reloading
 func shoot(pos, dir, velocity):
