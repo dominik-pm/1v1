@@ -750,7 +750,7 @@ transform = Transform( 1, 0, 0, 2.84217e-14, 1.19209e-07, -1, 0, 1, 0, 0, 0.4371
 bone_name = "Head"
 
 [node name="Torso" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( 1, -8.7423e-08, 0, 1.80001e-14, -1.19209e-07, 1, -8.7423e-08, -1, 0, 0, -4.76837e-07, 0 )
+transform = Transform( 1, -8.45811e-08, -2.21092e-08, 1.80562e-14, -0.252899, 0.967493, -8.7423e-08, -0.967493, -0.252899, 0, -4.76837e-07, 0 )
 bone_name = "Torso"
 
 [node name="Arm1l" type="BoneAttachment" parent="Armature/Skeleton"]
@@ -770,19 +770,19 @@ transform = Transform( 1.46177e-06, -0.994911, 0.100751, -1.27933e-07, 0.100751,
 bone_name = "Arm2.r"
 
 [node name="Leg1l" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -1, 1.50996e-07, -5.49153e-14, -1.00116e-13, -1.11123e-07, 1, 1.50996e-07, 1, 2.30332e-07, 0.593093, -2.89983, 3.4284e-07 )
+transform = Transform( -0.999964, 0.00766691, 0.00360975, 0.00719304, 0.542725, 0.839879, 0.00448018, 0.839875, -0.542761, 0.593093, -2.80556, 0.733364 )
 bone_name = "Leg1.l"
 
 [node name="Leg2l" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( 1, 5.27041e-21, 1.96512e-19, 2.84217e-14, 1.51496e-08, 1, -1.26488e-20, -1, 1.34359e-07, 0.593093, -4.29979, 2.03844e-08 )
+transform = Transform( 0.998804, -0.0474417, 0.0117922, -0.0419183, -0.707056, 0.705914, -0.025152, -0.705564, -0.7082, 0.58804, -3.98136, 1.49321 )
 bone_name = "Leg2.l"
 
 [node name="Leg1r" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( -1, -8.7422e-08, -5.49153e-14, -7.36224e-14, -1.11123e-07, 1, -8.7422e-08, 1, 2.30332e-07, -0.593093, -2.89983, 3.42841e-07 )
+transform = Transform( -0.9995, -0.0316247, -0.000153188, 0.0235208, -0.746599, 0.664859, -0.0211403, 0.664523, 0.746969, -0.593093, -2.80556, 0.733364 )
 bone_name = "Leg1.r"
 
 [node name="Leg2r" type="BoneAttachment" parent="Armature/Skeleton"]
-transform = Transform( 1, -6.3574e-08, 8.47033e-20, 2.93847e-14, 1.51496e-08, 1, -6.3574e-08, -1, 1.34359e-07, -0.593093, -4.29979, 2.03855e-08 )
+transform = Transform( 0.999679, 0.0250597, -0.00368342, -0.0116534, 0.584165, 0.811551, 0.0224889, -0.811248, 0.58427, -0.592878, -3.73634, -0.312363 )
 bone_name = "Leg2.r"
 
 [connection signal="timeout" from="Camera/TimerShake" to="Camera" method="_on_TimerShake_timeout"]

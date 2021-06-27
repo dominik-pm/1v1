@@ -189,10 +189,9 @@ func die():
 	deatheffect.global_transform.origin = $Center.global_transform.origin
 	
 	# add a ragdoll
-	#var ragdoll = preloaded_ragdoll.instance()
-	#get_tree().root.add_child(ragdoll)
-	#ragdoll.rotation = rotation
-	#ragdoll.init(global_transform.origin)
+	var rd = preloaded_ragdoll.instance()
+	rd.init(global_transform.origin, rotation)
+	get_tree().root.add_child(rd)
 	
 	# if spectating this puppet -> tell the world to spectate another one
 	if camera.current:

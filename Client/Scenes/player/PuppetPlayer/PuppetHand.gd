@@ -179,8 +179,6 @@ func hide_all_items():
 		if slot.get_child_count() > 0:
 			var weapon = slot.get_children()[0]
 			weapon.visible = false
-			print('hiding:')
-			print(weapon)
 
 # shooting/reloading
 func shoot(pos, dir, velocity):

@@ -42,3 +42,10 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 	swinging = false
 	alternate_swinging = false
 	already_hit = false
+
+
+func _on_Blade_body_entered(body):
+	if swinging and not already_hit:
+		if body is BodypartHitBox and body.player is Bot:
+			already_hit = true
+			body.get_damage(damage)

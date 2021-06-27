@@ -7,15 +7,26 @@ script/source = "extends Spatial
 
 export var ttl = 10
 
+var ttl_timer
+
 func _ready():
+	ttl_timer = Timer.new()
+	ttl_timer.one_shot = true
+	ttl_timer.wait_time = ttl
+	add_child(ttl_timer)
+	ttl_timer.connect(\"timeout\", self, \"_on_ttl_timer_finished\")
+	
 	$AnimationPlayer.play(\"idle\")
 	$Armature/Skeleton.physical_bones_start_simulation()
-	yield(get_tree().create_timer(ttl), \"timeout\")
+	ttl_timer.start()
+
+func _on_ttl_timer_finished():
 	$Armature/Skeleton.physical_bones_stop_simulation()
 	queue_free()
 
-func init(pos):
+func init(pos, rot):
 	transform.origin = Vector3(pos)
+	rotation = rot
 "
 
 [sub_resource type="ArrayMesh" id=2]

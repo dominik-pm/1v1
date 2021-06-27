@@ -157,8 +157,7 @@ func die():
 	
 	# add a ragdoll
 	var rd = ragdoll.instance()
-	rd.rotation = rotation
-	rd.init(global_transform.origin)
+	rd.init(global_transform.origin, rotation)
 	get_tree().root.add_child(rd)
 	
 	# respawn

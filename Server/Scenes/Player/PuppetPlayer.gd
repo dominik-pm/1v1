@@ -251,9 +251,8 @@ func die():
 	
 	# add a ragdoll
 	#var ragdoll = preloaded_ragdoll.instance()
+	#ragdoll.init(global_transform.origin, rotation)
 	#get_tree().root.add_child(ragdoll)
-	#ragdoll.init(global_transform.origin)
-	#ragdoll.rotation = rotation
 	
 	# if spectating this puppet -> tell the world to spectate another one
 	if camera.current:

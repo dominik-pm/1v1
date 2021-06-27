@@ -7,15 +7,26 @@ script/source = "extends Spatial
 
 export var ttl = 10
 
+var ttl_timer
+
 func _ready():
+	ttl_timer = Timer.new()
+	ttl_timer.one_shot = true
+	ttl_timer.wait_time = ttl
+	add_child(ttl_timer)
+	ttl_timer.connect(\"timeout\", self, \"_on_ttl_timer_finished\")
+	
 	$AnimationPlayer.play(\"idle\")
 	$Armature/Skeleton.physical_bones_start_simulation()
-	yield(get_tree().create_timer(ttl), \"timeout\")
+	ttl_timer.start()
+	
+func _on_ttl_timer_finished():
 	$Armature/Skeleton.physical_bones_stop_simulation()
 	queue_free()
 
-func init(pos):
+func init(pos, rot):
 	transform.origin = Vector3(pos)
+	rotation = rot
 "
 
 [sub_resource type="ArrayMesh" id=2]
@@ -678,12 +689,12 @@ transform = Transform( 1, 0, -2.86986e-42, 1.03315e-40, 1, 0, -2.86986e-42, 0, 1
 shape = SubResource( 5 )
 
 [node name="Physical Bone Arm1l" type="PhysicalBone" parent="Armature/Skeleton"]
-transform = Transform( -0.735191, 4.66389e-08, -0.677859, -0.677859, -1.26088e-07, 0.735192, -5.5667e-07, 1, 2.11955e-07, 1.47307, -0.78054, 7.23613e-06 )
+transform = Transform( -0.735191, 4.66389e-08, -0.677859, -0.677859, -1.26087e-07, 0.735192, -5.5667e-07, 1, 2.11956e-07, 1.47307, -0.78054, 7.23613e-06 )
 collision_layer = 2
 collision_mask = 13
 joint_type = 2
-joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.91412e-06, -6.69974e-06, 0.805763 )
-body_offset = Transform( 1, -1.15484e-07, -2.38419e-07, -3.09199e-07, 1, 2.98024e-08, -2.38419e-07, -2.98023e-08, 1, 8.10623e-06, 6.67572e-06, -0.805763 )
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.89011e-06, -6.69974e-06, 0.805763 )
+body_offset = Transform( 1, -1.15484e-07, -2.68221e-07, -3.09199e-07, 1, 2.98025e-08, -2.38419e-07, -2.98022e-08, 1, 8.10623e-06, 6.67572e-06, -0.805763 )
 mass = 5.0
 weight = 49.0
 bone_name = "Arm1.l"
@@ -701,8 +712,8 @@ transform = Transform( -0.735191, -4.42518e-08, 0.677859, 0.677859, -2.49899e-07
 collision_layer = 2
 collision_mask = 13
 joint_type = 2
-joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.00851e-07, 4.76838e-06, 0.805775 )
-body_offset = Transform( 1, 2.98023e-08, 2.98024e-08, -5.96045e-08, 0.999999, 1.56319e-13, -2.98023e-08, -1.19209e-07, 1, 4.76837e-07, -4.76837e-06, -0.805775 )
+joint_offset = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.00851e-07, 4.76837e-06, 0.805775 )
+body_offset = Transform( 1, 2.98023e-08, 2.98024e-08, -5.96044e-08, 0.999999, 3.69482e-13, -2.98023e-08, -1.19209e-07, 1, 4.76837e-07, -4.76837e-06, -0.805775 )
 mass = 5.0
 weight = 49.0
 bone_name = "Arm1.r"
